@@ -12,7 +12,9 @@ In the virtual environment run the following commands in terminal:
 pip install flask
 pip install flask_mysqldb
 
-#### Running the application
+#### Create a folder static and insert the assets folder into it
+
+## Running the application
 
 Run the following command:
 python app.py
