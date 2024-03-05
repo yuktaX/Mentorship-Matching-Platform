@@ -22,7 +22,7 @@ For now schema.sql needs to be run manually on mySQL workbench
 
 
 #### All html files are inside templates folder and the asset folder has been migrated inside the static folder
-All href links inside html files to the asset folder has been replaced by /..static/assets/ from assets/
+All href links inside html files to the asset folder has been replaced by ../static/assets/ from assets/
 
 All href links to .html files have been replaced to their URLs (in most cases removed the .html part ---> login.html replaced by /login). Appropriate functions for handling URLS have been added
 
