@@ -1,6 +1,6 @@
-## To run the application
+# To run the application
 
-#### Create a virtual environment
+### Create a virtual environment
 
 #### Virtual environment creation:(windows)
 virtualenv env
