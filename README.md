@@ -9,8 +9,7 @@ Virtual environment activation:
 env\Scripts\activate.ps1
 
 In the virtual environment run the following commands in terminal:
-pip install flask
-pip install flask_mysqldb
+pip install flask,flask_mysqldb
 
 #### Create a folder static and insert the assets folder into it
 
