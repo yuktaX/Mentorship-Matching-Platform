@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 app=Flask(__name__)
 #from app import routes, models
 
-pin="@Tarushi15mad"
+
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:password@localhost/mentify"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy()
