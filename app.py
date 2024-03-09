@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask,render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
- 
+import smtplib
+
+
  
 app = Flask(__name__)
 #from app import routes, models
@@ -32,6 +34,17 @@ def init_db():
                 if command.strip():
                     cursor.execute(command)
         db.commit()
+
+def send_email(sender,receiver,subject,message):
+    passcode=''
+    text=f"Subject : {subject}\n\n{message}"
+    server = smtplib.SMTP("smtp.gmail.com",587)
+    server.starttls()
+
+    server.login(sender,passcode)               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
+    server.sendmail(sender,receiver,text)
+    print("Email has been sent to : ", receiver)
+
 
 @app.route('/')
 def hello():
@@ -112,6 +125,7 @@ def signup_process():
             cursor.execute(
             'INSERT INTO mentee(mentee_name,contact_no,email_id,username,pass_word) VALUES(%s,%s, %s,%s, %s)', (name,contact_no,email_id,username,password) )
             mysql.connection.commit()
+            send_email("mentify@example.com",email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentee on Mentify!")       #Replace mentify@example.com with your email_id
             return render_template("login.html",msg="Signup Successful. You may login Now")
         else:
             print("registering mentor")
@@ -126,6 +140,7 @@ def signup_process():
             cursor.execute(
            'INSERT INTO mentor(mentor_name,contact_no,email_id,username,pass_word) VALUES(%s, %s, %s,%s, %s)', (name,contact_no,email_id,username,password) )
             mysql.connection.commit()
+            send_email("mentify@example.com",email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentor on Mentify! Kindly log into Mentify website and upload your resume. On approval by admin you will be able to create courses and enroll mentees. On aproval you will be sent a confirmation email")  #Replace mentify@example.com with your email_id
             return render_template("login.html",msg="Signup Successful. You may login Now")
 
 @app.route('/logout')
