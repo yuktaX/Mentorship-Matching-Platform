@@ -1,72 +1,37 @@
-
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
-import mysql.connector
-from flask_sqlalchemy import SQLAlchemy
-
-app=Flask(__name__)
+ 
+ 
+app = Flask(__name__)
 #from app import routes, models
+ 
+app.secret_key = 'your secret key'
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:password@localhost/mentify"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy()
-db.init_app(app)
+ 
+ 
+app.config['MYSQL_HOST'] = '127.0.0.1'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = '281613'
+app.config['MYSQL_DB'] = 'mentify'
+ 
+ 
+mysql = MySQL(app)
 
+user_type=''
 
-class mentee(db.Model):
-    __tablename__="mentee"
-    mentee_id = db.Column(db.Integer, primary_key=True,nullable=False,autoincrement=True)
-    name = db.Column(db.String(100))
-    contact_no = db.Column(db.String(10))
-    email_id = db.Column(db.String(100))
-    password = db.Column(db.String(15), nullable=False, unique=True)
-    category = db.relationship('mentee_category', backref='mentee')
-    username=db.Column(db.String(100),unique=True)
-
-    def __init__(self, name,contact_no, email_id,password):
-        self.name = name
-        self.contact_no = contact_no
-        self.email_id = email_id
-        self.password=password
-
-def create_db():
+def init_db():
     with app.app_context():
-        db.create_all()
-  
-class mentor(db.Model):
-    __tablename__="mentor"
-    mentor_id = db.Column(db.Integer, primary_key=True,nullable=False,autoincrement=True)
-    name = db.Column(db.String(100))
-    contact_no = db.Column(db.String(10))
-    email_id = db.Column(db.String(100))
-    qualification = db.Column(db.String(100))
-    work_exp = db.Column(db.String(255))
-    password = db.Column(db.String(15), nullable=False, unique=True)
-    username=db.Column(db.String(100),unique=True)
-
-class category(db.Model):
-    __tablename__="category"
-    category_id = db.Column(db.Integer, primary_key=True,nullable=False,autoincrement=True)
-    category_name = db.Column(db.String(100))
-    int_category = db.relationship('mentee_category', backref='category')
-
-class mentee_category(db.Model):
-    __tablename__="mentee_category"
-    category_id = db.Column(db.Integer,db.ForeignKey('category.category_id'),primary_key=True)
-    mentee_id = db.Column(db.Integer,db.ForeignKey('mentee.mentee_id'),primary_key=True) 
-
-class mentorship_prog(db.Model): 
-    program_id = db.Column(db.Integer, primary_key=True,nullable=False,autoincrement=True)
-    mentee_id = db.Column(db.Integer,db.ForeignKey('mentee.mentee_id'))
-    mentor_id = db.Column(db.Integer,db.ForeignKey('mentor.mentor_id'))
-    category_id = db.Column(db.Integer,db.ForeignKey('category.category_id'))
-    payment = db.Column(db.Integer)
-    status=db.Column(db.String(10))
-
-
+        db = mysql.connection
+        with app.open_resource('schema.sql', mode='r') as f:
+            sql_commands = f.read().split(';')
+            cursor = db.cursor()
+            for command in sql_commands:
+                if command.strip():
+                    cursor.execute(command)
+        db.commit()
 
 @app.route('/')
 def hello():
@@ -79,53 +44,89 @@ def hello2():
 def process_login():
     msg=''
     if request.method=='POST' and 'username' in request.form and 'password' in request.form:
-        user = mentee.query.filter_by(username=request.form.get("username")).first()
+        username=request.form['username']
+        password=request.form['password']
+        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            'SELECT * FROM mentee WHERE username = % s ', (username,) )
+        user=cursor.fetchone()
         if user:
-            if user.password == request.form.get("password"):
+    
+            if user['pass_word'] == request.form.get("password"):
                 session['loggedin']=True
                 return redirect(url_for("dashboard"))
-            msg="incorrect username or password"
-            return render_template("login.html",msg=msg)
+            else:                
+                msg="incorrect username or password"
+                return render_template("login.html",msg=msg)
         else:
-            user = mentor.query.filter_by(username=request.form.get("username")).first() 
+            cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(
+            'SELECT * FROM mentor WHERE username = % s ', (username,) )
+            user=cursor.fetchone()
             if user:
-              if user.password == request.form.get("password"):
-                session['loggedin']=True
-                return redirect(url_for("dashboard"))
-            msg="incorrect username or password"
-            return render_template("login.html",msg=msg)
+                if user['pass_word'] == request.form.get("password"):
+                    session['loggedin']=True
+                    return redirect(url_for("dashboard"))
+            else:
+                msg="incorrect username or password"
+                return render_template("login.html",msg=msg)
+            
+    # return render_template('login.html')
         
+#@app.route('\signup_process',methods=['GET','POST'])
+#def signup_process():
+ #   msg=''
+  #  if request.method=='POST'and 'Full name' in request.form and 'Email address' in request.form and 'Phone number' in request.form  and 
+
 
 @app.route('/signup_main',methods=['GET','POST'])
 def signup_main():
-    if request.method=='POST':
-        type=request.form['name']
-        return render_template("signup.html")
+    return render_template("signup_main.html")
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template("dashboard.html")
+
+@app.route('/user_category',methods=['GET','POST'])
+def user_category():
+    global user_type
+    user_type=request.form['button']
+    print("User type : ", user_type)   
+    return render_template("signup.html",user_type=user_type)
+
 
 @app.route('/signup',methods=['GET','POST'])
 def signup_process():
+    
     msg=''
     if request.method=='POST':
-        if type=="mentee": 
+        print(user_type)
+        if user_type=="mentee": 
+            print("registering mentee")
             name = request.form['name']
             contact_no = request.form['contact_no']
             email_id = request.form['email']
             password = request.form['password']
-            #username = request.form['username']
-            new_user=mentee(name=name,contact_no=contact_no,email_id=email_id,password=password)#,username=username)
-            db.session.mentee.add(new_user)
-            db.session.commit()
+            username = request.form['username']
+            cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(
+            'INSERT INTO mentee(mentee_name,contact_no,email_id,username,pass_word) VALUES(%s,%s, %s,%s, %s)', (name,contact_no,email_id,username,password) )
+            mysql.connection.commit()
+            return render_template("login.html",msg="Signup Successful. You may login Now")
         else:
+            print("registering mentor")
             name = request.form['name']
             contact_no = request.form['contact_no']
             email_id = request.form['email']
             password = request.form['password']
-            #username = request.form['username']
+            username = request.form['username']
             #qualification=request.form['qualification']
            # work_exp=request.form['work_exp']
-            new_user=mentor(name=name,contact_no=contact_no,email_id=email_id,password=password)#,username=username,qualification=qualification,work_exp=work_exp)
-            db.session.mentor.add(new_user)
-            db.session.commit()
+            cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(
+           'INSERT INTO mentor(mentor_name,contact_no,email_id,username,pass_word) VALUES(%s, %s, %s,%s, %s)', (name,contact_no,email_id,username,password) )
+            mysql.connection.commit()
+            return render_template("login.html",msg="Signup Successful. You may login Now")
 
 @app.route('/logout')
 def logout():
@@ -136,7 +137,7 @@ def logout():
 
 if __name__ == "__main__":
     with app.app_context():
-        # Create database tables
-        db.create_all()
+        init_db()
     app.run(debug=True)
-
+            
+ 

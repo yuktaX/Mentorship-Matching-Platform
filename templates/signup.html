@@ -61,10 +61,10 @@
           <div class="card" style="background-color: #bcf1ff">
             <div class="card-body p-5 text-center">
               <h3 class="mb-5" style="font-family: Open Sans; color: #000408">
-                Mentee
+                {{user_type}}
               </h3>
 
-              <form>
+              <form action="/signup" method="post">
                 <div class="form-group input-group" style="margin: 2% 2%">
                   <div
                     class="input-group-prepend"
@@ -76,14 +76,38 @@
                     >
                       <i class="fa fa-user" style="font-size: 1.25em"></i>
                     </span>
+                  
                   </div>
                   <input
-                    name=""
+                    name="name"
                     class="form-control"
                     placeholder="Full name"
                     type="text"
                   />
                 </div>
+
+                <div class="form-group input-group" style="margin: 2% 2%">
+                  <div
+                    class="input-group-prepend"
+                    style="margin-top: 0.5%; background-color: #bcf1ff"
+                  >
+                    <span
+                      class="input-group-text"
+                      style="background-color: #ffffff"
+                    >
+                      <i class="fa fa-envelope" style="font-size: 1.25em"></i>
+                    </span>
+                  
+                  </div>
+                  <input
+                    name="username"
+                    class="form-control"
+                    placeholder="Create username"
+                    type="text"
+                  />
+                </div>
+                
+                
                 <div class="form-group input-group" style="margin: 2% 2%">
                   <div
                     class="input-group-prepend"
@@ -97,7 +121,7 @@
                     </span>
                   </div>
                   <input
-                    name=""
+                    name="email"
                     class="form-control"
                     placeholder="Email address"
                     type="email"
@@ -116,7 +140,7 @@
                     </span>
                   </div>
                   <input
-                    name=""
+                    name="contact_no"
                     class="form-control"
                     placeholder="Phone number"
                     type="text"
@@ -157,6 +181,7 @@
                     class="form-control"
                     placeholder="Create password"
                     type="password"
+                    name="password"
                   />
                 </div>
                 <div class="form-group input-group" style="margin: 2% 2%">
