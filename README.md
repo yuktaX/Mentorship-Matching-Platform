@@ -25,4 +25,11 @@ All href links inside html files to the asset folder has been replaced by ../sta
 
 All href links to .html files have been replaced to their URLs (in most cases removed the .html part ---> login.html replaced by /login). Appropriate functions for handling URLS have been added
 
-## Schema.sql file is run at the start of program by init_db() function. No manual initialization required anymore. All table creations are hence present in schema.sql file.
+#### Schema.sql file is run at the start of program by init_db() function. No manual initialization required anymore. All table creations are hence present in schema.sql file.
+
+## Added smtplib for emailing. Server sends a mail to mentees and mentors that they have completed signup and can login. Mentors are also asked to upload resume for approval.
+
+#### How to execute?
+Replace "mentify@example.com" with your email_id. Email will be sent from your email id. In place of passcode add google app password. Type in app password in google. Enable 2 factor authentication if not enabled. Create a app name. An app password will be generated. Copy it and replace passcode with it. Now you can send mails to mentor/mentee email_id from your email_id.
+
+Payment.html and stylesheet created but not linked with backend yet.
