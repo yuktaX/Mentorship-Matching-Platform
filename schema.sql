@@ -19,7 +19,8 @@ CREATE TABLE mentor (
     qualification VARCHAR(100),
     work_exp VARCHAR(255),
     pass_word VARCHAR(15) NOT NULL UNIQUE,
-    username VARCHAR(100) UNIQUE NOT NULL
+    username VARCHAR(100) UNIQUE NOT NULL,
+    file_name VARCHAR(255)
 );
 
 

@@ -3,6 +3,8 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
 import smtplib
+import os
+from werkzeug.utils import secure_filename
 
 
  
@@ -18,6 +20,7 @@ app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = '281613'
 app.config['MYSQL_DB'] = 'mentify'
+app.config['UPLOAD_FOLDER']='give folder path'  #provide folder path here where to store resumes
  
  
 mysql = MySQL(app)
@@ -67,7 +70,7 @@ def process_login():
     
             if user['pass_word'] == request.form.get("password"):
                 session['loggedin']=True
-                return redirect(url_for("dashboard"))
+                return redirect(url_for("dashboard_mentee",username=username))
             else:                
                 msg="incorrect username or password"
                 return render_template("login.html",msg=msg)
@@ -96,16 +99,29 @@ def process_login():
 def signup_main():
     return render_template("signup_main.html")
 
+@app.route('/dashboard_mentee/<username>')
+def dashboard_mentee(username):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+            'SELECT mentee_name FROM mentee WHERE username = % s ', (username,) )
+    mentee=cursor.fetchone()
+    mentee=mentee['mentee_name']
+    return render_template("dashboard_mentee.html",mentee=mentee)
+
 @app.route('/dashboard')
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template("dashboard_mentee.html")
 
 @app.route('/user_category',methods=['GET','POST'])
 def user_category():
     global user_type
     user_type=request.form['button']
-    print("User type : ", user_type)   
-    return render_template("signup.html",user_type=user_type)
+    print("User type : ", user_type)
+    if(user_type=='mentee'):   
+        return render_template("signup_mentee.html")
+    elif(user_type=='mentor'):
+        return render_template("signup_mentor.html")
+
 
 
 @app.route('/signup',methods=['GET','POST'])
@@ -134,11 +150,16 @@ def signup_process():
             email_id = request.form['email']
             password = request.form['password']
             username = request.form['username']
+            resume=request.files['file']
+            if resume:
+                filename = secure_filename(resume.filename)
+                resume.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                print('File uploaded successfully')
             #qualification=request.form['qualification']
            # work_exp=request.form['work_exp']
             cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute(
-           'INSERT INTO mentor(mentor_name,contact_no,email_id,username,pass_word) VALUES(%s, %s, %s,%s, %s)', (name,contact_no,email_id,username,password) )
+           'INSERT INTO mentor(mentor_name,contact_no,email_id,username,pass_word,file_name) VALUES(%s, %s, %s,%s, %s,%s)', (name,contact_no,email_id,username,password,resume.filename) )
             mysql.connection.commit()
             send_email("mentify@example.com",email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentor on Mentify! Kindly log into Mentify website and upload your resume. On approval by admin you will be able to create courses and enroll mentees. On aproval you will be sent a confirmation email")  #Replace mentify@example.com with your email_id
             return render_template("login.html",msg="Signup Successful. You may login Now")
@@ -148,7 +169,7 @@ def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
-    return redirect(url_for('landing'))
+    return redirect(url_for('hello'))
 
 if __name__ == "__main__":
     with app.app_context():
