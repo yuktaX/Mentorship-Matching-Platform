@@ -33,3 +33,9 @@ All href links to .html files have been replaced to their URLs (in most cases re
 Replace "mentify@example.com" with your email_id. Email will be sent from your email id. In place of passcode add google app password. Type in app password in google. Enable 2 factor authentication if not enabled. Create a app name. An app password will be generated. Copy it and replace passcode with it. Now you can send mails to mentor/mentee email_id from your email_id.
 
 Payment.html and stylesheet created but not linked with backend yet.
+
+#### For file uploads, create a folder for example 'file_uploads'.
+Add path of the file_uploads in app.config like this : app.config['UPLOAD_FOLDER']='C:\\..\\mentorship_matching_platform\\file_uploads'
+
+#### Change in schema
+In mentor table, an attribute file_name added which stores name of resume file
