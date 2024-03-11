@@ -1127,3 +1127,37 @@ section {
 #footer .credits a:hover {
   color: #0a98c0;
 }
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #0a286e;
+}
+
+.profile-button {
+  background: rgb(3, 44, 70);
+  box-shadow: none;
+  border: none;
+}
+
+.profile-button:hover {
+  background: #5dccff;
+}
+
+.profile-button:focus {
+  background: #5dccff;
+  box-shadow: none;
+}
+
+.profile-button:active {
+  background: #5dccff;
+  box-shadow: none;
+}
+
+.back:hover {
+  color: #5dccff;
+  cursor: pointer;
+}
+
+.labels {
+  font-size: 16px;
+}
