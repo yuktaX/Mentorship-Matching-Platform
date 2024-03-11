@@ -5,6 +5,7 @@ import re
 import smtplib
 import os
 from werkzeug.utils import secure_filename
+import random
 
 
  
@@ -20,7 +21,7 @@ app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = '281613'
 app.config['MYSQL_DB'] = 'mentify'
-app.config['UPLOAD_FOLDER']='give folder path'  #provide folder path here where to store resumes
+app.config['UPLOAD_FOLDER']='F:\\de shaw\\project2\\Mentorship-Matching-Platform\\file_uploads'  #provide folder path here where to store resumes
  
  
 mysql = MySQL(app)
@@ -44,7 +45,7 @@ def send_email(sender,receiver,subject,message):
     server = smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
 
-    server.login(sender,passcode)               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
+    server.login(sender,"xxxxxxxxxxxxxx")               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
     server.sendmail(sender,receiver,text)
     print("Email has been sent to : ", receiver)
 
@@ -103,10 +104,11 @@ def signup_main():
 def dashboard_mentee(username):
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-            'SELECT mentee_name FROM mentee WHERE username = % s ', (username,) )
+            'SELECT * FROM mentee WHERE username = % s ', (username,) )
     mentee=cursor.fetchone()
-    mentee=mentee['mentee_name']
-    return render_template("dashboard_mentee.html",mentee=mentee)
+    print(mentee)
+    mentee_name=mentee['mentee_name']
+    return render_template("dashboard_mentee.html",mentee=mentee_name,username=mentee['username'])
 
 @app.route('/dashboard')
 def dashboard():
@@ -122,6 +124,24 @@ def user_category():
     elif(user_type=='mentor'):
         return render_template("signup_mentor.html")
 
+@app.route('/profile_mentee/<username>',methods=['GET','POST'])
+def profile_mentee(username):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+            'SELECT * FROM mentee WHERE username = % s ', (username,) )
+    mentee=cursor.fetchone()
+    if request.method=='POST':
+        new_name=request.form['name']
+        new_contact=request.form['contact_no']
+        new_email=request.form['email_id']
+        new_education=request.form['education']
+        new_interest=request.form['interests']
+        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('UPDATE mentee SET mentee_name = %s,contact_no=%s,email_id=%s,education=%s,interests=%s WHERE username = %s',(new_name,new_contact,new_email,new_education,new_interest,username))
+        mysql.connection.commit()
+        return render_template('profile_mentee.html',name=new_name,username=username,contact_no=new_contact,email_id=new_email,education=new_education,interests=new_interest,msg='Profile details updated successfully')
+
+    return render_template('profile_mentee.html',name=mentee['mentee_name'],username=mentee['username'],contact_no=mentee['contact_no'],email_id=mentee['email_id'],education=mentee['education'],interests=mentee['interests'],msg='')
 
 
 @app.route('/signup',methods=['GET','POST'])
@@ -163,6 +183,67 @@ def signup_process():
             mysql.connection.commit()
             send_email("mentify@example.com",email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentor on Mentify! Kindly log into Mentify website and upload your resume. On approval by admin you will be able to create courses and enroll mentees. On aproval you will be sent a confirmation email")  #Replace mentify@example.com with your email_id
             return render_template("login.html",msg="Signup Successful. You may login Now")
+        
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    global otp_gen
+    global email_fp
+    global usertype_fp
+    if request.method == 'POST':
+        if 'username' in request.form and 'email' in request.form:
+            username = request.form['username']
+            email_fp = request.form['email']
+            cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(
+            'SELECT * FROM mentee WHERE username = % s ', (username,) )
+            user=cursor.fetchone()
+            if user:
+                usertype_fp='mentee'
+                if(email_fp==user['email_id']):
+                    otp = str(random.randint(100000, 999999))
+                    otp_gen=otp
+                    send_email("mentify@example.com",email_fp,"OTP For Changing Password",f"Hi {user['mentee_name']}!\nOTP for changing password is {otp}. Do not share the OTP with anyone.\nIf you did not apply for changing password kindly report it on Mentify website.")
+                    return render_template('forgot_password.html', username=username, show_otp_form=True,msg='')
+                else:
+                    return render_template('forgot_password.html', username=username, show_otp_form=False,msg='Incorrect Email Id entered')
+            else:
+                cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+                cursor.execute(
+                    'SELECT * FROM mentor WHERE username = % s ', (username,) )
+                user=cursor.fetchone()
+                if user:
+                    usertype_fp='mentor'
+                    if(email_fp==user['email_id']):
+                        otp = str(random.randint(100000, 999999))
+                        otp_gen=otp
+                        send_email("mentify@example.com",email_fp,"OTP For Changing Password",f"Hi {user['mentor_name']}!\nOTP for changing password is {otp}. Do not share the OTP with anyone.\nIf you did not apply for changing password kindly report it on Mentify website.")
+                        return render_template('forgot_password.html', username=username, show_otp_form=True,msg='')
+                    else:
+                        return render_template('forgot_password.html', username=username, show_otp_form=False,msg='Incorrect Email Id entered')                   
+                else:
+                    return render_template('forgot_password.html', username=username, show_otp_form=False,msg='Incorrect username entered')
+
+        elif 'otp' in request.form and 'new_password' in request.form:
+            username = request.form['username']
+            otp_entered = request.form['otp']
+            new_password = request.form['new_password']
+            print(f"Otp gen : {otp_gen}, otp_entered : {otp_entered}")
+            if(otp_entered==otp_gen):
+                send_email("mentify@example.com",email_fp,"Password Changed","Greetings from Mentify! Password of your mentify account has been successfully changed! If you did not initiate the password change, kindly contact mentify support team.")
+                cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+                if(usertype_fp=='mentee'):
+                    cursor.execute('UPDATE mentee SET pass_word = %s WHERE username = %s AND email_id = %s',(new_password,username,email_fp))
+                elif(usertype_fp=='mentor'):
+                    cursor.execute('UPDATE mentor SET pass_word = %s WHERE username = %s AND email_id = %s',(new_password,username,email_fp))
+                mysql.connection.commit()
+                return render_template('login.html',msg="Password change successful!")
+            else:
+                return render_template('forgot_password.html', username=username, show_otp_form=False,msg='Incorrect OTP entered')
+            
+
+    # Render the default form for entering username and email
+    return render_template('forgot_password.html', show_otp_form=False,msg='')
+
 
 @app.route('/logout')
 def logout():

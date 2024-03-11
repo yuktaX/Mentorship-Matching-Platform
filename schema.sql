@@ -8,7 +8,10 @@ CREATE TABLE mentee (
     contact_no VARCHAR(10),
     email_id VARCHAR(100),
     pass_word VARCHAR(15) NOT NULL UNIQUE,
-    username VARCHAR(100) UNIQUE not NULL
+    username VARCHAR(100) UNIQUE not NULL,
+    interests VARCHAR(500),
+    education VARCHAR(200)
+
 );
 
 CREATE TABLE mentor (
@@ -52,5 +55,5 @@ CREATE TABLE mentorship_prog (
 
 
 
-INSERT INTO mentee(mentee_name,email_id,username,pass_word) VALUES ('Mimi','mimi@gmail.com','mimi','abcd');
-INSERT INTO mentor(mentor_name,email_id,username,pass_word,qualification,work_exp) VALUES ('Sneha','sneha@gmail.com','sneha','1234','BTech',4);
+INSERT INTO mentee(mentee_name,email_id,username,pass_word) VALUES ('Mimi','arunkumarvaishnovi@gmail.com','mimi','abcd');
+INSERT INTO mentor(mentor_name,email_id,username,pass_word,qualification,work_exp) VALUES ('Sneha','vaishnoviarun7060@gmail.com','sneha','1234','BTech',4);
