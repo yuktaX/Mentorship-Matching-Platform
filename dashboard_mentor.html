@@ -37,45 +37,6 @@
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet" />
   </head>
-  <style>
-    li::marker {
-      font-size: 0;
-    }
-
-    section {
-      padding: 60px 0;
-    }
-
-    .carousel-item {
-      height: 32rem;
-      background: rgb(209, 237, 255);
-      color: rgb(0, 0, 0);
-      position: relative;
-      background-position: center;
-      background-size: 10px;
-    }
-    .overlay-image {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      top: 0;
-      background-position: right center;
-      background-repeat: no-repeat;
-      background-size: 30%;
-      margin-right: 40px;
-    }
-
-    a {
-      text-decoration: inherit;
-      color: inherit;
-      text-decoration: None;
-    }
-    a:hover {
-      text-decoration: none;
-      color: inherit;
-    }
-  </style>
 
   <body>
     <!-- ======= Header ======= -->
@@ -88,15 +49,12 @@
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
             <li>
-              <a class="nav-link scrollto" href="dashboard_mentee.html">Home</a>
-            </li>
-            <li>
-              <a class="nav-link scrollto" href="dashboard_mentee.html"
-                >Programs</a
+              <a class="nav-link scrollto active" href="dashboard_mentor.html"
+                >My Programs</a
               >
             </li>
-            <li><a href="profile_mentee.html">Profile</a></li>
-            <li><a href="my_courses_mentee.html">My Courses</a></li>
+            <li><a href="profile_mentor.html">Profile</a></li>
+            <li><a href="create_program_mentor.html">Create Program</a></li>
             <li><a href="">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
@@ -104,130 +62,30 @@
       </div>
     </header>
     <!-- End Header -->
-
-    <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
-      <ol class="carousel-indicators">
-        <li
-          data-bs-target="#myCarousel"
-          data-bs-slide-to="0"
-          class="active"
-        ></li>
-        <li data-bs-target="#myCarousel" data-bs-slide-to="1"></li>
-        <li data-bs-target="#myCarousel" data-bs-slide-to="2"></li>
-      </ol>
-
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <a href=""
-            ><div
-              class="overlay-image"
-              style="
-                background-image: url('assets/img/webdev1-removebg-preview.png');
-              "
-            ></div>
-            <div
-              class="container"
-              style="
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                padding-bottom: 50px;
-              "
-            >
-              <h1 style="margin-left: 100px">Data Science</h1>
-              <p style="margin-left: 100px; margin-bottom: 150px">
-                Learn from the best!
-              </p>
-            </div>
-          </a>
-        </div>
-
-        <div class="carousel-item">
-          <a href=""
-            ><div
-              class="overlay-image"
-              style="
-                background-image: url('assets/img/webdev-removebg-preview.png');
-              "
-            ></div>
-            <div
-              class="container"
-              style="
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                padding-bottom: 50px;
-              "
-            >
-              <h1 style="margin-left: 100px">Software Development</h1>
-              <p style="margin-left: 100px; margin-bottom: 150px">
-                Learn from the best!
-              </p>
-            </div>
-          </a>
-        </div>
-
-        <div class="carousel-item">
-          <a href=""
-            ><div
-              class="overlay-image"
-              style="
-                background-image: url('assets/img/ML_img-removebg-preview.png');
-              "
-            ></div>
-            <div
-              class="container"
-              style="
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                padding-bottom: 50px;
-              "
-            >
-              <h1 style="margin-left: 100px">Machine Learning and AI</h1>
-              <p style="margin-left: 100px; margin-bottom: 150px">
-                Learn from the best!
-              </p>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <a
-        href="#myCarousel"
-        class="carousel-control-prev"
-        role="button"
-        data-bs-slide="prev"
-      >
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      </a>
-      <a
-        href="#myCarousel"
-        class="carousel-control-next"
-        role="button"
-        data-bs-slide="next"
-      >
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      </a>
-    </div>
-
+    <br />
     <main>
-      <section id="services" class="services section-bg">
+      <section style="background-color: #c9ebff; margin-top: 6%">
+        <div
+          class="container mt-2"
+          style="
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          "
+        >
+          <h3>Mentor Status: Pending</h3>
+        </div>
+      </section>
+      <section id="services" class="services section-bg" style="margin-top: 2%">
         <div class="container" data-aos="fade-up">
           <header class="section-header">
-            <h3>Mentorship Programs</h3>
-            <p>
-              Sort and filter as per your interests! We offer a variety of
-              programs, and would love to help you find the right one.
-            </p>
+            <h3>My Programs</h3>
+            <p>View all the programs you mentor.</p>
           </header>
 
           <div class="justify-content-center align-items-center">
             <form method="" action="">
-              <label for="filter" class="border-transparent"></label>
+              <!-- <label for="filter" class="border-transparent"></label>
 
               <select name="filter" id="filter">
                 <option value="valuation">Filter - None</option>
@@ -245,7 +103,7 @@
                 <option value="valuation">Most popular</option>
                 <option value="equity">Low to high price</option>
                 <option value="investment">High to low price</option>
-              </select>
+              </select> -->
 
               <input
                 type=""
@@ -272,9 +130,7 @@
                 <div class="icon" style="background: rgb(209, 237, 255)">
                   <i class="bi bi-briefcase" style="color: #1985f0"></i>
                 </div>
-                <h3 class="title">
-                  <a href="course_page_mentee.html">Course Name</a>
-                </h3>
+                <h3 class="title"><a href="">Course Name</a></h3>
                 <h5 style="font-size: small">Course Duration:</h5>
                 <h5 style="font-size: small">Price: 1000 INR</h5>
                 <p class="description">description of course</p>
@@ -289,9 +145,7 @@
                 <div class="icon" style="background: rgb(209, 237, 255)">
                   <i class="bi bi-bar-chart" style="color: #1985f0"></i>
                 </div>
-                <h3 class="title">
-                  <a href="course_page_mentee.html">Course Name</a>
-                </h3>
+                <h3 class="title"><a href="">Course Name</a></h3>
                 <h5 style="font-size: small">Course Duration:</h5>
                 <h5 style="font-size: small">Price: 1000 INR</h5>
                 <p class="description">description of course</p>
@@ -306,9 +160,7 @@
                 <div class="icon" style="background: rgb(209, 237, 255)">
                   <i class="bi bi-book" style="color: #1985f0"></i>
                 </div>
-                <h3 class="title">
-                  <a href="course_page_mentee.html">Course Name</a>
-                </h3>
+                <h3 class="title"><a href="">Course Name</a></h3>
                 <h5 style="font-size: small">Course Duration:</h5>
                 <h5 style="font-size: small">Price: 1000 INR</h5>
                 <p class="description">description of course</p>
