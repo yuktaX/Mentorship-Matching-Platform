@@ -57,7 +57,18 @@ CREATE TABLE mentorship_prog (
     FOREIGN KEY (category_id) REFERENCES category(category_id)
 );
 
-CREATE TABLE tag(
+CREATE TABLE course (
+    program_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    mentor_id INT,
+    course_name VARCHAR(255), 
+    no_of_registrations INT DEFAULT 0,
+    tag1 VARCHAR(50) DEFAULT 'none',
+    tag2 VARCHAR(50) DEFAULT 'none',
+    tag3 VARCHAR(50) DEFAULT 'none',
+    tag4 VARCHAR(50) DEFAULT 'none',
+    tag5 VARCHAR(50) DEFAULT 'none',
+    FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
+);CREATE TABLE tag(
     tag_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     tag_name VARCHAR(100)
 );
