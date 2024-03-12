@@ -19,11 +19,15 @@ CREATE TABLE mentor (
     mentor_name VARCHAR(100),
     contact_no VARCHAR(10),
     email_id VARCHAR(100),
-    qualification VARCHAR(100),
+    degree VARCHAR(100),
+    institute VARCHAR(100),
+    major VARCHAR(100),
     work_exp VARCHAR(255),
     pass_word VARCHAR(15) NOT NULL UNIQUE,
     username VARCHAR(100) UNIQUE NOT NULL,
-    file_name VARCHAR(255)
+    file_name VARCHAR(255),
+    mentor_status VARCHAR(20) NOT NULL,
+    interests VARCHAR(500)
 );
 
 
@@ -53,7 +57,25 @@ CREATE TABLE mentorship_prog (
     FOREIGN KEY (category_id) REFERENCES category(category_id)
 );
 
+CREATE TABLE tag(
+    tag_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    tag_name VARCHAR(100)
+);
+
+CREATE TABLE course (
+    program_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    mentor_id INT,
+    course_name VARCHAR(255), 
+    no_of_registrations INT DEFAULT 0,
+    tag1 VARCHAR(50) DEFAULT 'none',
+    tag2 VARCHAR(50) DEFAULT 'none',
+    tag3 VARCHAR(50) DEFAULT 'none',
+    tag4 VARCHAR(50) DEFAULT 'none',
+    tag5 VARCHAR(50) DEFAULT 'none',
+    FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
+);
 
 
-INSERT INTO mentee(mentee_name,email_id,username,pass_word) VALUES ('Mimi','arunkumarvaishnovi@gmail.com','mimi','abcd');
-INSERT INTO mentor(mentor_name,email_id,username,pass_word,qualification,work_exp) VALUES ('Sneha','vaishnoviarun7060@gmail.com','sneha','1234','BTech',4);
+
+INSERT INTO mentee(mentee_name,email_id,username,pass_word) VALUES ('Mimi','mimi@example.com','mimi','abcd');
+INSERT INTO mentor(mentor_name,email_id,username,pass_word,degree,work_exp,mentor_status) VALUES ('Sneha','sneha@example.com','sneha','1234','BTech',4,"unverified");
