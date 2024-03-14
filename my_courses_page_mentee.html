@@ -69,12 +69,10 @@
     <main>
       <section style="margin-top: 10%">
         <div class="container" data-aos="fade-up">
-          <header style="text-align: center">
+          <header
+            style="text-align: center; background-color: rgb(190, 238, 255)"
+          >
             <h2>Course Name</h2>
-            <!-- <p>
-              Sort and filter as per your interests! We offer a variety of
-              programs, and would love to help you find the right one.
-            </p> -->
           </header>
 
           <div>Start Date:</div>
@@ -94,15 +92,91 @@
 
           <br />
 
-          <div style="text-align: center"></div>
+          <div
+            style="text-align: center; color: rgb(2, 62, 95); font-size: small"
+          >
+            <b
+              >Kindly provide us
+              <u
+                ><a href="feedback_form.html" style="color: #59a7d7"
+                  >feedback here</a
+                ></u
+              >, so we can improve our services and let the mentor know how you
+              found the program.</b
+            >
+          </div>
         </div>
       </section>
 
       <br />
 
-      <!-- <section>
-        <h2>Feedback</h2>
-      </section> -->
+      <section>
+        <div class="container">
+          <h3
+            style="text-align: center; background-color: #96bbfa; padding: 5px"
+          >
+            Messages for {{ course }}
+          </h3>
+
+          <ul id="messages" style="text-align: center">
+            {% for message in messages %}
+            <li>{{ message.sender }}: {{ message.content }}</li>
+            {% endfor %}
+          </ul>
+          <div
+            class="d-flex justify-content-center align-items-center mb-3 text"
+          >
+            <form action="/send_message" method="post"></form>
+            <div
+              class="col-md-6"
+              style="background-color: rgb(252, 252, 252); text-align: center"
+            >
+              <form id="message-form">
+                <div class="row mt-2">
+                  <input
+                    style="margin-top: 2%"
+                    type="text"
+                    id="sender-input"
+                    name="sender"
+                    placeholder="Your Name"
+                    required
+                  />
+                  <input
+                    style="margin-top: 2%"
+                    type="text"
+                    id="message-input"
+                    name="content"
+                    placeholder="Message"
+                    required
+                  />
+                  <input
+                    type="hidden"
+                    id="course-input"
+                    name="course"
+                    value="{{ course }}"
+                  />
+                </div>
+                <button
+                  class="btn btn-primary btn-sm btn-block"
+                  type="submit"
+                  style="background: #96bbfa; color: black; margin-top: 2%"
+                >
+                  Send
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer id="footer" class="section-bg" style="margin-top: 5%">
+        <div class="container" style="text-align: center">
+          <div>
+            Have an issue? Raise it
+            <u><a href="raise_ticket.html" style="color: #59a7d7">Here</a></u>
+          </div>
+        </div>
+      </footer>
     </main>
 
     <a
