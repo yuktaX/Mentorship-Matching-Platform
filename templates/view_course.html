@@ -104,39 +104,36 @@
       <section id="services" class="services section-bg" style="margin-top: 5%">
         <div class="container" data-aos="fade-up">
           <header class="section-header">
-            <h3>Create New Mentorship Program</h3>
-            <h4>{{msg}}</h4>
-            <p>
-              Kindly fill in your proposal for a new program. After approval by
-              the Mentify Team, we will contact you for further steps.
-            </p>
+            <h3>{%if viewer=='admin'%}Mentorship Program Proposal{%else%} Mentorship Program Details  {%endif%}</h3>
+           
         </header>
 
     <div class="container mt-3 mb-3" style="background-color: #d0f5ff">
         <div class="col-md-12">
             <div class="p-3 py-5">
                 <div class="d-flex justify-content-center align-items-center mb-3 text">
-                    <h2 style="text-align: center;">Proposal Form</h2>
+                    <h2 style="text-align: center;">Course Details</h2>
                 </div>
                 <form action="" method="post">
                 <div class="row mt-2">
-                    <div class="col-md-12"><label class="labels"><b>Course Name</b></label><input type="text" class="form-control" placeholder="Full Name" value="" name="course_name"></div>
+                    <div class="col-md-12"><label class="labels"><b>Course Name</b></label><input type="text" class="form-control" placeholder="Full Name" value="{{course['course_name']}}" readonly></div>
+                    <div class="col-md-12"><label class="labels"><b>Mentor Name</b></label><input type="text" class="form-control" placeholder="Full Name" value="{{mentor_name}}" readonly></div>
                 </div>
                 <div class="row mt-2">
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Start Date</b></label><input type="date" class="form-control" placeholder="" name="start_date"></div>
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program End Date</b></label><input type="date" class="form-control" placeholder="" name="end_date"></div>
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Price</b></label><input type="text" class="form-control" placeholder="" name="price"></div>
+                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Start Date</b></label><input type="date" class="form-control" placeholder="" value="{{course['course_start']}}" readonly></div>
+                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program End Date</b></label><input type="date" class="form-control" placeholder="" value="{{course['course_end']}}"readonly></div>
+                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Price</b></label><input type="text" class="form-control" placeholder="" value="{{course['course_price']}}"readonly></div>
                 </div>
 
-                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Program Description</i></label><textarea type="text" class="form-control" placeholder="Kindly tell us about what guidance and how this program offers" name="desc"></textarea></div> <br>
+                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Program Description</i></label><textarea type="text" class="form-control" placeholder="Kindly tell us about what guidance and how this program offers" value="{{course['course_desc']}}" readonly></textarea></div> <br>
 
-                <p>Kindly select relevant tags for the course</p>
+                <p>Tags relevant for the course</p>
                                 
                 
                 <div class="col-md-12">
                   {%for tag in tags%}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="{{tag['tag_name']}}" >
+                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" checked readonly >
                         <label class="form-check-label" for="defaultCheck1">
                             {{tag['tag_name']}}
                         </label>

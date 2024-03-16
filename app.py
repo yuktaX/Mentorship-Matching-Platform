@@ -83,7 +83,7 @@ def process_login():
             if user:
                 if user['pass_word'] == request.form.get("password"):
                     session['loggedin']=True
-                    return redirect(url_for("dashboard"))
+                    return redirect(url_for("dashboard_mentor",username=username))
             else:
                 msg="incorrect username or password"
                 return render_template("login.html",msg=msg)
@@ -107,6 +107,15 @@ def dashboard_mentee(username):
     print(mentee)
     mentee_name=mentee['mentee_name']
     return render_template("dashboard_mentee.html",mentee=mentee_name,username=mentee['username'])
+
+@app.route('/dashboard_mentor/<username>')
+def dashboard_mentor(username):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+            'SELECT * FROM mentor WHERE username = % s ', (username,) )
+    mentor=cursor.fetchone()
+    return render_template("dashboard_mentor.html",mentor=mentor,username=mentor['username'])
+
 
 
 @app.route('/signup',methods=['GET','POST'])
@@ -151,9 +160,6 @@ def signup_process():
             send_email("vaishnoviarun7060@gmail.com",email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentor on Mentify! Kindly log into Mentify website and upload your resume. On approval by admin you will be able to create courses and enroll mentees. On aproval you will be sent a confirmation email")  #Replace mentify@example.com with your email_id
             return render_template("login.html",msg="Signup Successful. You may login Now")
 
-@app.route('/dashboard')
-def dashboard():
-    return render_template("dashboard_mentee.html")
 
 @app.route('/user_category',methods=['GET','POST'])
 def user_category():
@@ -266,12 +272,8 @@ def view_mentor_profile(username):
             cursor.execute('UPDATE mentor SET mentor_status = %s WHERE username = %s' ,('rejected',username) )
             mysql.connection.commit()
             send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Application status for Mentorship","Greetings from Mentify! Your profile has been inspected by Mentify. We regret to inform you that we could not ascertain your application. Please log into our website to update your profile details so that we may inspect it again. ")
-        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute(
-            'SELECT * FROM mentor WHERE mentor_status = % s ', ('unverified',) )
-        unapproved_mentors=cursor.fetchall()
-        return render_template('admin.html',mentors=unapproved_mentors)
-    return render_template('profile_mentor.html',name=mentor['mentor_name'],username=mentor['username'],contact_no=mentor['contact_no'],email_id=mentor['email_id'],degree=mentor['degree'],education=mentor['institute'],major=mentor['major'],work_exp=mentor['work_exp'],interests=mentor['interests'],msg='',view_profile=True,give_approval=True,filename=mentor['file_name'])
+        return redirect(url_for('admin'))
+    return render_template('profile_mentor.html',mentor=mentor,name=mentor['mentor_name'],username=mentor['username'],contact_no=mentor['contact_no'],email_id=mentor['email_id'],degree=mentor['degree'],education=mentor['institute'],major=mentor['major'],work_exp=mentor['work_exp'],interests=mentor['interests'],msg='',view_profile=True,give_approval=True,filename=mentor['file_name'])
     
 @app.route('/create_program/<username>',methods=['GET','POST'])
 def create_program(username):
@@ -302,7 +304,8 @@ def create_program(username):
             if tag_name in request.form:
                 cursor.execute('INSERT INTO course_tag_relation(course_id,tag_id) VALUES(%s,%s)',(course_id,tag_id))
         mysql.connection.commit()
-    return render_template('create_program_mentor.html',username=username,tags=tags)
+        return render_template('create_program_mentor.html',username=username,tags=tags,msg='Course proposal successfully submitted. On approval by Mentify, you will receive an email confirming acceptance of your proposal and mentees will be able to join your program ')
+    return render_template('create_program_mentor.html',username=username,tags=tags,msg='')
 
 
         
@@ -371,14 +374,12 @@ def admin():
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM mentor WHERE mentor_status = %s', ('unverified',))
     unapproved_mentors=cursor.fetchall()
-    print(unapproved_mentors)
-    return render_template("admin.html",mentors=unapproved_mentors)
+    cursor.execute('SELECT * FROM course WHERE course_status = %s', ('unverified',))
+    unapproved_courses=cursor.fetchall()
+    return render_template("admin.html",mentors=unapproved_mentors,courses=unapproved_courses)
 
 @app.route('/add_tag',methods=['GET','POST'])
-def add_tag():
-    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT * FROM mentor WHERE mentor_status = %s', ('unverified',))
-    unapproved_mentors=cursor.fetchall()
+def add_tag():       
     if request.method=='POST':
         new_tag=request.form['tag']
         cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -387,7 +388,19 @@ def add_tag():
         if not existing_tag:
             cursor.execute('INSERT INTO tag(tag_name) VALUES (%s)', (new_tag,))
             mysql.connection.commit()
-        return render_template("admin.html",mentors=unapproved_mentors)
+        return redirect(url_for('admin'))
+
+@app.route('/view_course/<viewer_type>/<course_id>',methods=['GET','POST'])
+def view_course(course_id,viewer_type):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM course WHERE course_id = %s', (course_id,))
+    course=cursor.fetchone()
+    cursor.execute('SELECT * FROM mentor WHERE mentor_id = %s', (course['mentor_id'],))
+    mentor=cursor.fetchone()
+    cursor.execute('SELECT * FROM course_tag_relation WHERE course_id=%s',(course['course_id'],))
+    tags=cursor.fetchall()
+    return render_template('view_course.html',course=course,viewer=viewer_type,mentor_name=mentor['mentor_name'],tags=tags)
+
 
 
 

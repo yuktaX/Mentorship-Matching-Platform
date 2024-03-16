@@ -145,14 +145,14 @@
           <br />
   
           <div class="row g-5">
-            {% for mentor in mentors %}
+            {% for course in courses %}
             <div class="col-md-6 col-lg-4 wow bounceInUp" data-aos="zoom-in" data-aos-delay="100">
               <div class="box">
                 <div class="icon" style="background: rgb(209, 237, 255)">
                   <i class="bi bi-journal-text" style="color: #1985f0"></i>
                 </div>
-                <h3 class="title"><a href="{{ url_for('view_mentor_profile', username=mentor.username) }}">{{mentor.mentor_name}}</a></h3>
-                <p class="description">{{mentor.interests}}</p>
+                <h3 class="title"><a href="{{ url_for('view_course',viewer_type='admin',course_id=course['course_id']) }}">{{course.course_name}}</a></h3>
+                <p class="description">{{course.course_desc}}</p>
                 <!-- <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
                     View Profile
                 </button> -->

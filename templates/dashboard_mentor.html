@@ -49,12 +49,12 @@
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
             <li>
-              <a class="nav-link scrollto active" href="{{ url_for('dashboard_mentee', username=username) }}"
+              <a class="nav-link scrollto active" href="{{ url_for('dashboard_mentor', mentor=mentor,username=username) }}"
                 >My Programs</a
               >
             </li>
             <li><a href="{{ url_for('profile_mentor', username=username,msg='') }}">Profile</a></li>
-            <li><a href="create_program_mentor.html">Create Program</a></li>
+            <li><a href="{{ url_for('create_program', username=username) }}">Create Program</a></li>
             <li><a href="">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
@@ -73,7 +73,7 @@
             text-align: center;
           "
         >
-          <h3>Mentor Status: Pending</h3>
+          <h3>Mentor Status:{%if mentor['mentor_status'] == 'unverified'%} Pending {%elif mentor['mentor_status']=='verified'%} Verified {%elif mentor['mentor_status']=='rejected'%} Rejected {%endif%}</h3>
         </div>
       </section>
       <section id="services" class="services section-bg" style="margin-top: 2%">
