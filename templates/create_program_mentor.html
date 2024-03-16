@@ -37,9 +37,44 @@
     <!-- Template Main CSS File -->
     <link href="../static/assets/css/style.css" rel="stylesheet" />
   </head>
-
   <style>
+    li::marker {
+      font-size: 0;
+    }
 
+    section {
+      padding: 60px 0;
+    }
+
+    .carousel-item {
+      height: 32rem;
+      background: rgb(209, 237, 255);
+      color: rgb(0, 0, 0);
+      position: relative;
+      background-position: center;
+      background-size: 10px;
+    }
+    .overlay-image {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      background-position: right center;
+      background-repeat: no-repeat;
+      background-size: 30%;
+      margin-right: 40px;
+    }
+
+    a {
+      text-decoration: inherit;
+      color: inherit;
+      text-decoration: None;
+    }
+    a:hover {
+      text-decoration: none;
+      color: inherit;
+    }
   </style>
 
   <body>
@@ -52,10 +87,12 @@
         <h1 class="logo me-auto"><a href="/">Mentify</a></h1>
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
-            <li><a class="nav-link scrollto active" href="{{url_for('dashboard_mentee', username=username)}}">Home</a></li>
-            <li><a href="{{ url_for('profile_mentee', username=username,msg='') }}">Profile</a></li>
-            <li><a href="my_courses_mentee">My Courses</a></li>
-            <li><a href="/logout">Logout</a></li>
+            <li>
+              <a class="nav-link scrollto" href="/">My Programs</a>
+            </li>
+            <li><a href="{{url_for('profile_mentor', username=username)}}">Profile</a></li>
+            <li><a href="{{url_for('create_program', username=username)}}">Create Program</a></li>
+            <li><a href="">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
         </nav>
@@ -64,50 +101,59 @@
     <!-- End Header -->
 
     <main>
-      <div class="container rounded bg-white mt-5 mb-5">
-        <div class="row">
-          <div class="col-md-3 border-right">
-            <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" src="https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?size=338&ext=jpg&ga=GA1.1.1395880969.1710028800&semt=ais"><span class="font-weight-bold">{{name}}</span><span class="text-black-50">{{username}}</span><span> </span></div>
-          </div>
-          <div class="col-md-8 border-right">
+      <section id="services" class="services section-bg" style="margin-top: 5%">
+        <div class="container" data-aos="fade-up">
+          <header class="section-header">
+            <h3>Create New Mentorship Program</h3>
+            <p>
+              Kindly fill in your proposal for a new program. After approval by
+              the Mentify Team, we will contact you for further steps.
+            </p>
+        </header>
+
+    <div class="container mt-3 mb-3" style="background-color: #d0f5ff">
+        <div class="col-md-12">
             <div class="p-3 py-5">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <u><h3 class="text-right">Profile Settings</h3></u>
+                <div class="d-flex justify-content-center align-items-center mb-3 text">
+                    <h2 style="text-align: center;">Proposal Form</h2>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <u><h5 class="text-right">{{msg}}</h5></u>
-              </div>
                 <form action="" method="post">
                 <div class="row mt-2">
-                    <div class="col-md-6"><label class="labels"><b>Name</label><input type="text" class="form-control" placeholder="Full Name" value="{{name}}" name="name"></div>
-            
+                    <div class="col-md-12"><label class="labels"><b>Course Name</b></label><input type="text" class="form-control" placeholder="Full Name" value="" name="course_name"></div>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Phone Number</b></label><input type="text" class="form-control" placeholder="Phone number" value="{{contact_no}}" name="contact_no"></div>
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Email ID</b></label><input type="text" class="form-control" placeholder="Email id" value="{{email_id}}" name="email_id"></div>
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Education/Experience</b></label><input type="text" class="form-control" placeholder="Institute/company" value="{{education}}" name="education"></div>
+                <div class="row mt-2">
+                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Start Date</b></label><input type="date" class="form-control" placeholder="" name="start_date"></div>
+                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program End Date</b></label><input type="date" class="form-control" placeholder="" name="end_date"></div>
+                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Price</b></label><input type="text" class="form-control" placeholder="" name="price"></div>
                 </div>
-                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>What mentorship I'm looking for/Your interests</i></label><textarea type="text" name="interests" class="form-control" placeholder="Kindly tell us about what guidance you would like to find through our platform" >{{interests}}</textarea></div> <br>
+
+                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Program Description</i></label><textarea type="text" class="form-control" placeholder="Kindly tell us about what guidance and how this program offers" name="desc"></textarea></div> <br>
+
                 <p>Kindly select relevant tags for the course</p>
                                 
                 
                 <div class="col-md-12">
                   {%for tag in tags%}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" {% if is_checked[tag['tag_name']] %}checked{% endif %} id="defaultCheck1" name="{{tag['tag_name']}}">
+                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="{{tag['tag_name']}}" {% if  %}checked{% endif %}>
                         <label class="form-check-label" for="defaultCheck1">
                             {{tag['tag_name']}}
                         </label>
                     </div>
                     {%endfor%}
+                    
+                </div>
+                
 
-                <div class="mt-5 text-center"><button class="btn profile-button" type="submit" style="color: #ffffff;">Save Profile</button></div>
+                <div class="mt-5 text-center"><button class="btn profile-button" type="submit" style="color: #ffffff;">Submit</button></div>
                 </form>
             </div>
         </div>
     </div>
-
+      </section>
+      <!-- End Services Section -->
     </main>
+
     <!-- ======= Footer ======= -->
     <footer id="footer" class="section-bg">
       <div class="container">

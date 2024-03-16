@@ -58,15 +58,16 @@ CREATE TABLE mentorship_prog (
 );
 
 CREATE TABLE course (
-    program_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    course_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     mentor_id INT,
     course_name VARCHAR(255), 
     no_of_registrations INT DEFAULT 0,
-    tag1 VARCHAR(50) DEFAULT 'none',
-    tag2 VARCHAR(50) DEFAULT 'none',
-    tag3 VARCHAR(50) DEFAULT 'none',
-    tag4 VARCHAR(50) DEFAULT 'none',
-    tag5 VARCHAR(50) DEFAULT 'none',
+    course_start DATE,
+    course_end DATE,
+    course_price INT,
+    course_status VARCHAR(20),
+    course_desc VARCHAR(500),
+    
     FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
 );
 
@@ -75,6 +76,45 @@ CREATE TABLE tag(
     tag_name VARCHAR(100)
 );
 
+CREATE TABLE course_tag_relation(
+    course_tag_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    course_id INT,
+    tag_id INT,
+    FOREIGN KEY (tag_id) REFERENCES tag(tag_id),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
+
+);
+
+CREATE TABLE mentee_tag(
+    mentee_tag_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    mentee_id INT,
+    tag_id INT,
+    FOREIGN KEY (tag_id) REFERENCES tag(tag_id),
+    FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id)
+
+);
+
+CREATE TABLE mentee_complaints(
+    complaint_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    mentee_id INT,
+    complaint_date DATE,
+    complaint_desc VARCHAR(500),
+    complaint_status VARCHAR(20),
+    complaint_action VARCHAR(500),
+    FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id)
+
+);
+
+CREATE TABLE mentor_complaints(
+    complaint_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    mentor_id INT,
+    complaint_date DATE,
+    complaint_desc VARCHAR(500),
+    complaint_status VARCHAR(20),
+    complaint_action VARCHAR(500),
+    FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
+
+);
 
 
 
