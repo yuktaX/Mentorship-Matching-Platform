@@ -48,3 +48,4 @@ Sends OTP in your mail. Password updated only on entering correct mail. On passw
 
 #### Profile viewing and updating successfully implemented for mentee
 In profile updating you can also select tags which interest you
+#### Course creation by mentor, course approval , payment for course functionalities implemented. Need search and filter functionality to showcase coursess
