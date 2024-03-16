@@ -40,8 +40,11 @@ Add path of the file_uploads in app.config like this : app.config['UPLOAD_FOLDER
 #### Change in schema
 In mentor table, an attribute file_name added which stores name of resume file
 In mentee attributes education and interests added
+Course table modified adding a few attributes
+Added tag relation tables in the schema
 
 #### Forgot password functionality implemented.
 Sends OTP in your mail. Password updated only on entering correct mail. On password update, an intimation is sent on mail
 
 #### Profile viewing and updating successfully implemented for mentee
+In profile updating you can also select tags which interest you
