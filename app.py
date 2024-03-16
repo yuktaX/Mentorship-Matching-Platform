@@ -45,7 +45,7 @@ def send_email(sender,receiver,subject,message):
     server = smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
 
-    server.login(sender,"nvpcshfqlstxxkgw")               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
+    server.login(sender,"xxxxxxxxxxxxxx")               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
     server.sendmail(sender,receiver,text)
     print("Email has been sent to : ", receiver)
 
