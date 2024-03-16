@@ -253,8 +253,10 @@ def view_file(username, filename):
     file_path=os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username), filename)
     return send_file(file_path, as_attachment=True)
 
-@app.route('/view_mentor_profile/<username>',methods=['GET','POST'])
-def view_mentor_profile(username):
+@app.route('/view_mentor_profile',methods=['GET','POST'])
+def view_mentor_profile():
+    viewer = request.args.get('viewer')
+    username=request.args.get('username')
    
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
@@ -273,7 +275,7 @@ def view_mentor_profile(username):
             mysql.connection.commit()
             send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Application status for Mentorship","Greetings from Mentify! Your profile has been inspected by Mentify. We regret to inform you that we could not ascertain your application. Please log into our website to update your profile details so that we may inspect it again. ")
         return redirect(url_for('admin'))
-    return render_template('profile_mentor.html',mentor=mentor,name=mentor['mentor_name'],username=mentor['username'],contact_no=mentor['contact_no'],email_id=mentor['email_id'],degree=mentor['degree'],education=mentor['institute'],major=mentor['major'],work_exp=mentor['work_exp'],interests=mentor['interests'],msg='',view_profile=True,give_approval=True,filename=mentor['file_name'])
+    return render_template('profile_mentor.html',mentor=mentor,name=mentor['mentor_name'],username=mentor['username'],contact_no=mentor['contact_no'],email_id=mentor['email_id'],degree=mentor['degree'],education=mentor['institute'],major=mentor['major'],work_exp=mentor['work_exp'],interests=mentor['interests'],msg='',view_profile=True,give_approval=True,filename=mentor['file_name'],viewer=viewer)
     
 @app.route('/create_program/<username>',methods=['GET','POST'])
 def create_program(username):
@@ -390,17 +392,48 @@ def add_tag():
             mysql.connection.commit()
         return redirect(url_for('admin'))
 
-@app.route('/view_course/<viewer_type>/<course_id>',methods=['GET','POST'])
-def view_course(course_id,viewer_type):
+@app.route('/view_course',methods=['GET','POST'])
+def view_course():
+    viewer = request.args.get('viewer')
+    course_id = int(request.args.get('course_id'))
+
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM course WHERE course_id = %s', (course_id,))
     course=cursor.fetchone()
     cursor.execute('SELECT * FROM mentor WHERE mentor_id = %s', (course['mentor_id'],))
     mentor=cursor.fetchone()
     cursor.execute('SELECT * FROM course_tag_relation WHERE course_id=%s',(course['course_id'],))
-    tags=cursor.fetchall()
-    return render_template('view_course.html',course=course,viewer=viewer_type,mentor_name=mentor['mentor_name'],tags=tags)
+    tag_rel=cursor.fetchall()
+    tags=[]
+    for tag in tag_rel:
+        cursor.execute('SELECT * FROM tag WHERE tag_id=%s',(tag['tag_id'],))
+        tag_new=cursor.fetchone()
+        tags.append(tag_new)
 
+    return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags)
+
+@app.route('/process_viewer_request',methods=['GET','POST'])
+def process_viewer_request():
+    course_id=int(request.args.get('course_id'))
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    if request.method=='POST':
+        if 'admin_comment' in request.form:
+            admin_comment=request.form['admin_comment']
+            print(admin_comment)
+            if 'accept' in request.form:
+                cursor.execute('UPDATE course SET admin_comment= %s,course_status=%s WHERE course_id=%s',(admin_comment,'verified',course_id))
+                mysql.connection.commit()
+            elif 'reject' in request.form:
+                cursor.execute('UPDATE course SET admin_comment=%s AND course_status=%s WHERE course_id=%s',(admin_comment,'rejected',course_id))
+                mysql.connection.commit()
+            return redirect(url_for('admin'))
+        elif 'register' in request.form:
+            amount=request.form['price']
+            return redirect(url_for('payment',amount=amount))
+
+@app.route('/payment/<int:amount>',methods=['GET','POST'])
+def payment(amount):
+    return render_template('payment.html',amount=amount)             
 
 
 

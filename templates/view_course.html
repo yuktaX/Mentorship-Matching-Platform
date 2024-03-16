@@ -114,18 +114,23 @@
                 <div class="d-flex justify-content-center align-items-center mb-3 text">
                     <h2 style="text-align: center;">Course Details</h2>
                 </div>
-                <form action="" method="post">
+                <form action="{{url_for('process_viewer_request')}}?course_id={{course['course_id']}}" method="post">
                 <div class="row mt-2">
                     <div class="col-md-12"><label class="labels"><b>Course Name</b></label><input type="text" class="form-control" placeholder="Full Name" value="{{course['course_name']}}" readonly></div>
-                    <div class="col-md-12"><label class="labels"><b>Mentor Name</b></label><input type="text" class="form-control" placeholder="Full Name" value="{{mentor_name}}" readonly></div>
+                    <div class="col-md-12">
+                      <label class="labels"><b>Mentor Name</b></label>
+                      <input type="text" class="form-control" placeholder="Full Name" value="{{ mentor.mentor_name }}" readonly>
+                      <a href="{{ url_for('view_mentor_profile')}}?viewer={{viewer}}&username={{mentor['username']}}" class="btn btn-primary">View Profile</a>
+                  </div>
+                  
                 </div>
                 <div class="row mt-2">
                     <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Start Date</b></label><input type="date" class="form-control" placeholder="" value="{{course['course_start']}}" readonly></div>
                     <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program End Date</b></label><input type="date" class="form-control" placeholder="" value="{{course['course_end']}}"readonly></div>
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Price</b></label><input type="text" class="form-control" placeholder="" value="{{course['course_price']}}"readonly></div>
+                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Price</b></label><input type="text" class="form-control" placeholder="" name="price" value="{{course['course_price']}}"readonly></div>
                 </div>
 
-                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Program Description</i></label><textarea type="text" class="form-control" placeholder="Kindly tell us about what guidance and how this program offers" value="{{course['course_desc']}}" readonly></textarea></div> <br>
+                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Program Description</i></label><textarea type="text" class="form-control" placeholder="Kindly tell us about what guidance and how this program offers" value="" readonly>{{course['course_desc']}}</textarea></div> <br>
 
                 <p>Tags relevant for the course</p>
                                 
@@ -142,8 +147,14 @@
                     
                 </div>
                 
+                {%if viewer=='admin'%}
+                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Admin comments</i></label><textarea type="text" class="form-control" placeholder="Any comments or suggestions on the course" value="" name="admin_comment"></textarea></div> <br>
 
-                <div class="mt-5 text-center"><button class="btn profile-button" type="submit" style="color: #ffffff;">Submit</button></div>
+                <div class="mt-5 text-center"><button class="btn profile-button" type="submit" style="color: #ffffff; background:rgb(10, 95, 10); "name="accept">Approve course</button>
+                  <button class="btn profile-button" type="submit" style="background: rgb(168, 37, 37); color: #ffffff;" name="reject">Reject course</button></div>
+                  {%elif viewer=='mentee'%}
+                  <div class="mt-5 text-center"><button class="btn profile-button" type="submit" style="color: #ffffff;" name="register">Register</button></div>
+                  {%endif%}
                 </form>
             </div>
         </div>

@@ -66,6 +66,7 @@ CREATE TABLE course (
     course_end DATE,
     course_price INT,
     course_status VARCHAR(20),
+    admin_comment VARCHAR(500),
     course_desc VARCHAR(500),
     
     FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
@@ -113,6 +114,14 @@ CREATE TABLE mentor_complaints(
     complaint_status VARCHAR(20),
     complaint_action VARCHAR(500),
     FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
+
+);
+CREATE TABLE course_mentee(
+    course_mentee_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    mentee_id INT,
+    course_id INT,
+    FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
 
 );
 
