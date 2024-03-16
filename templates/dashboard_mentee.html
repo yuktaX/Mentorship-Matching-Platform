@@ -226,7 +226,7 @@
               <label for="filter" class="border-transparent"></label>
 
               <select name="filter" id="filter">
-                <option value="">Filter - None</option>
+                <option value="none">Filter - None</option>
                 <option value="valuation">Tag A</option>
                 <option value="equity">Tag B</option>
                 <option value="investment">Tag C</option>
@@ -244,15 +244,20 @@
               </select>
 
               <input
-                type=""
-                value=""
-                style="
-                  background-color: rgb(216, 237, 250);
-                  border-color: #000000;
-                  border-width: 1px;
+               type="text"
+               name="search_term" 
+               style="
+               background-color: rgb(216, 237, 250);
+               border-color: #000000;
+               border-width: 1px;
                 "
-                placeholder="Search.."
+               placeholder="Search.."
               />
+              <select name="search_type">
+              <option value="mentor">Search by mentor</option>
+              <option value="course">Search by course</option>
+              </select>
+             <button type="submit">Apply</button>
             </form>
           </div>
 
