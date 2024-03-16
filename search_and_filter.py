@@ -33,69 +33,97 @@ def index():
 
   return render_template('index.html', data=data)
 
-@app.route('/search', methods=['POST'])
-def search():
-   """Searches the database based on mentor or course name."""
+@app.route('/search_sort_filter', methods=['POST'])
+def search_sort_filter():
+    """Sorts, searches, and filters data based on the provided parameters."""
     connection = connect_to_database()
     if connection is None:
         return "Error connecting to database"
 
-    mentor_name = request.form['mentor_name']
     cursor = connection.cursor()
-    # Join with mentor table to get mentor name
-    cursor.execute("""
+
+    # Default sorting option
+    sort_option = "no_of_registrations DESC"
+
+    # Default query without sorting, searching, or filtering
+    query = """
         SELECT course.*, mentor.mentor_name
         FROM course
-        JOIN mentor ON course.mentor_id = mentor.mentor_id 
-        WHERE mentor.mentor_name LIKE %s OR course.course_name LIKE %s
-    """,("%" + search_term + "%", "%" + search_term + "%"))
-    data = cursor.fetchall()
-    connection.close()
-
-    return render_template('index.html', data=data)
-
-@app.route('/filter', methods=['POST'])
-def filter():
-    """Filters data based on selected tags."""
-    connection = connect_to_database()
-    if connection is None:
-        return "Error connecting to database"
-
-    selected_tags = request.form.getlist('tags')
-
-    cursor = connection.cursor()
-
-    # Build dynamic query with OR clause for filtering based on tags
-    query = """
-        SELECT * FROM course
-        WHERE %s IN (tag1, tag2, tag3, tag4, tag5)
+        JOIN mentor ON course.mentor_id = mentor.mentor_id
     """
 
-    # Execute the query for each selected tag
-    data = []
-    for tag in selected_tags:
-        cursor.execute(query, (tag,))
-        data.extend(cursor.fetchall())
+    # Check if a sorting option is provided
+    if 'sort' in request.form:
+        sort_choice = request.form['sort']
+        if sort_choice == 'valuation':
+            sort_option = "no_of_registrations DESC"
+        elif sort_choice == 'equity':
+            sort_option = "course_price ASC"
+        elif sort_choice == 'investment':
+            sort_option = "course_price DESC"
 
-    connection.close()
+    # Check if a tag is selected for filtering
+    if 'filter' in request.form:
+        selected_tag = request.form['filter']
+        if selected_tag != 'none':
+            # Apply filtering based on the selected tag
+            query += """
+                WHERE course.course_id IN (
+                    SELECT course_id
+                    FROM course_tag_relation
+                    WHERE tag_id = (
+                        SELECT tag_id
+                        FROM tag
+                        WHERE tag_name = %s
+                    )
+                )
+            """
 
-    return render_template('index.html', data=data)
+    # Apply sorting to the query
+    query += f" ORDER BY {sort_option}"
 
+    # Execute the final query with all applied parameters
+    if 'search_term' in request.form:
+        search_term = request.form['search_term']
+        search_type = request.form['search_type']
 
-@app.route('/sort')
-def sort():
-    """Sorts data based on the number of registrations in descending order.(popularity)"""
-    connection = connect_to_database()
-    if connection is None:
-        return "Error connecting to database"
+        if search_term:
+            if 'filter' not in request.form or selected_tag == 'none':
+                # If no filtering is applied or filter is set to none, search without filtering
+                query += """
+                    WHERE
+                """
+            else:
+                # If filtering is applied, append AND to the query
+                query += """
+                    AND
+                """
 
-    cursor = connection.cursor()
-    # Sort by number of registrations in descending order
-    cursor.execute("SELECT * FROM course ORDER BY no_of_registrations DESC")
+            if search_type == 'mentor':
+                query += """
+                    mentor.mentor_name LIKE %s
+                """
+            elif search_type == 'course':
+                query += """
+                    course.course_name LIKE %s
+                """
+
+            # Execute the query with search parameters
+            cursor.execute(query, ("%" + search_term + "%",))
+        else:
+            # Execute the query without search parameters
+            cursor.execute(query)
+    else:
+        # Execute the query without search parameters
+        cursor.execute(query)
+
     data = cursor.fetchall()
     connection.close()
 
     return render_template('index.html', data=data)
+
+
+
 
 if __name__ == '__main__':
   app.run(debug=True)
