@@ -100,7 +100,7 @@ CREATE TABLE mentee_complaints(
     mentee_id INT,
     complaint_date DATE,
     complaint_desc VARCHAR(500),
-    complaint_status VARCHAR(20),
+    complaint_status ENUM('pending', 'resolved') DEFAULT 'pending',
     complaint_action VARCHAR(500),
     FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id)
 
@@ -111,7 +111,7 @@ CREATE TABLE mentor_complaints(
     mentor_id INT,
     complaint_date DATE,
     complaint_desc VARCHAR(500),
-    complaint_status VARCHAR(20),
+    complaint_status ENUM('pending', 'resolved') DEFAULT 'pending',
     complaint_action VARCHAR(500),
     FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
 
