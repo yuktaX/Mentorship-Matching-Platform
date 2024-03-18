@@ -51,6 +51,7 @@ CREATE TABLE mentorship_prog (
     mentor_id INT,
     category_id INT,
     payment INT,
+    course_name varchar(100) not null,
     status VARCHAR(10),
     FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id),
     FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id),
@@ -125,8 +126,19 @@ CREATE TABLE course_mentee(
 
 );
 
+CREATE TABLE messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    course_name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (course_name) REFERENCES mentorship_prog(course_name)
+);
 
 
 
 INSERT INTO mentee(mentee_name,email_id,username,pass_word) VALUES ('Mimi','mimi@example.com','mimi','abcd');
 INSERT INTO mentor(mentor_name,email_id,username,pass_word,degree,work_exp,mentor_status) VALUES ('Sneha','sneha@example.com','sneha','1234','BTech',4,"unverified");
+insert into mentorship_prog(mentor_id,mentee_id,course_name) values(1,1,'data structures');
+INSERT INTO messages (sender, content, course_name) VALUES
+('Sneha','Hello!', 'data structures'),
+('Mimi', 'Hi there!', 'data structures');
