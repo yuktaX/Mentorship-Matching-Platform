@@ -5,6 +5,7 @@ import re
 import smtplib
 import os
 from werkzeug.utils import secure_filename
+from flask_socketio import SocketIO, emit
 import random
 import search_and_filter.py
 
@@ -25,6 +26,7 @@ app.config['UPLOAD_FOLDER']='F:\\de shaw\\project2\\Mentorship-Matching-Platform
  
  
 mysql = MySQL(app)
+socketio = SocketIO(app)
 
 user_type=''
 
@@ -412,6 +414,25 @@ def view_course():
 
     return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags)
 
+@app.route('/messages/<course_name>/<username>')
+def messages(course_name,username):
+        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            'SELECT * FROM messages where course_name = %s',(course_name,))
+        messages = cursor.fetchall()
+        return render_template('my_courses_page_mentee.html',course_name=course_name,username=username,messages=messages)
+ 
+@socketio.on('new_message')
+def handle_new_message(data):
+    sender = data['sender']
+    content = data['content']
+    course_name = data['course_name']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("INSERT INTO messages(sender, content, course_name) VALUES (%s, %s, %s)",
+                   (sender, content, course_name))
+    mysql.connection.commit()
+    emit('new_message', {'sender': sender, 'content': content})
+
 @app.route('/process_viewer_request',methods=['GET','POST'])
 def process_viewer_request():
     course_id=int(request.args.get('course_id'))
@@ -526,6 +547,6 @@ def logout():
 if __name__ == "__main__":
     with app.app_context():
         init_db()
-    app.run(debug=True)
+    socketio.run(app)
             
  
