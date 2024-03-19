@@ -414,19 +414,30 @@ def view_course():
 
     return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags)
 
-@app.route('/messages/<course_name>/<username>')
-def messages(course_name,username):
-        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute(
-            'SELECT * FROM messages where course_name = %s',(course_name,))
-        messages = cursor.fetchall()
-        return render_template('my_courses_page_mentee.html',course_name=course_name,username=username,messages=messages)
- 
+@app.route('/my_courses/<username>')
+def my_courses(username):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+            'SELECT * FROM course WHERE course_id =(select course_id from course_mentee where mentee_id=( select mentee_id from mentee where username = %s))', (username,) )
+    courses=cursor.fetchall()
+    return render_template("my_courses_mentee.html",courses=courses,username=username)
+
+
+@app.route('/my_courses/<username>')
+def my_courses(username):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+            'SELECT * FROM course WHERE course_id =(select course_id from course_mentee where mentee_id=( select mentee_id from mentee where username = %s))', (username,) )
+    courses=cursor.fetchall()
+    return render_template("my_courses_mentee.html",courses=courses,username=username)
+
+
 @socketio.on('new_message')
 def handle_new_message(data):
     sender = data['sender']
     content = data['content']
     course_name = data['course_name']
+
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("INSERT INTO messages(sender, content, course_name) VALUES (%s, %s, %s)",
                    (sender, content, course_name))
