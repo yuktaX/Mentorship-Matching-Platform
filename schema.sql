@@ -31,7 +31,7 @@ CREATE TABLE mentor (
 );
 
 
-CREATE TABLE category (
+/*CREATE TABLE category (
     category_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     category_name VARCHAR(100)
     
@@ -57,12 +57,12 @@ CREATE TABLE mentorship_prog (
     FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id),
     FOREIGN KEY (category_id) REFERENCES category(category_id),
     index(course_name)
-);
+);*/
 
 CREATE TABLE course (
     course_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     mentor_id INT,
-    course_name VARCHAR(255), 
+    course_name VARCHAR(255) NOT NULL, 
     no_of_registrations INT DEFAULT 0,
     course_start DATE,
     course_end DATE,
@@ -70,7 +70,7 @@ CREATE TABLE course (
     course_status VARCHAR(20),
     admin_comment VARCHAR(500),
     course_desc VARCHAR(500),
-    
+    index(course_name)
     FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
 );
 
@@ -132,14 +132,14 @@ CREATE TABLE messages (
     sender VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
     course_name VARCHAR(100) NOT NULL,
-    FOREIGN KEY (course_name) REFERENCES mentorship_prog(course_name)
+    FOREIGN KEY (course_name) REFERENCES course(course_name)
 );
 
 
 
 INSERT INTO mentee(mentee_name,email_id,username,pass_word) VALUES ('Mimi','mimi@example.com','mimi','abcd');
 INSERT INTO mentor(mentor_name,email_id,username,pass_word,degree,work_exp,mentor_status) VALUES ('Sneha','sneha@example.com','sneha','1234','BTech',4,"unverified");
-insert into mentorship_prog(mentor_id,mentee_id,course_name) values(1,1,'data structures');
+insert into course(mentor_id,course_name,course_start,course_end,course_price,course_desc) values(1,'data structures','2024-01-03','2024-03-29','500','A complete beginnner to advanced data structures course');
 INSERT INTO messages (sender, content, course_name) VALUES
 ('Sneha','Hello!', 'data structures'),
 ('Mimi', 'Hi there!', 'data structures');
