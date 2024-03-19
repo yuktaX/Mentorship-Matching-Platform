@@ -153,7 +153,7 @@
                   <i class="bi bi-briefcase" style="color: #1985f0"></i>
                 </div>
                 {% for course_list in courses %}
-                <h3 class="title"><a href="/messages/{{course_list.course_name}}/{{course_list.course_start}}/{{course_list.course_end}}/{{course_list.course_desc}}/{{username}}">{{ course_list.course_name }}</a></h3>
+                <h3 class="title"><a href="/messages/{{course_list.course_name}}/{{username}}">{{ course_list.course_name }}</a></h3>
                 <h5 style="font-size: small">Course starts on : {{course_list.course_start}}</h5>
                 <h5 style="font-size: small">Course ends on : {{course_list.course_end}}</h5>
                 <h5 style="font-size: small">Price: {{course_list.course_price}} INR</h5>
