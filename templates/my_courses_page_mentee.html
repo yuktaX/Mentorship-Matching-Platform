@@ -7,7 +7,7 @@
     <title>Mentify - Dashboard</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
-    
+
     <!-- Favicons -->
     <link href="../static/assets/img/favicon.png" rel="icon" />
     <link href="../static/assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
@@ -72,22 +72,22 @@
           <header
             style="text-align: center; background-color: rgb(190, 238, 255)"
           >
-            <h2>{{course_name}}</h2>
+            <h2>{{course.course_name}}</h2>
           </header>
 
-          <div>Start Date:{{course_start}}</div>
-          <div>End Date:{{course_end}}</div>
+          <div>Start Date:{{course.course_start}}</div>
+          <div>End Date:{{course.course_end}}</div>
 
           <br />
 
           <div class="container" style="text-align: center">
-            {{course_desc}}
+            {{course.course_desc}}
           </div>
 
           <br />
 
           <div style="text-align: center; font-style: italic">
-            Status: {{course_status}}
+            Status: {{course.course_status}}
           </div>
 
           <br />
@@ -115,7 +115,7 @@
           <h3
             style="text-align: center; background-color: #96bbfa; padding: 5px"
           >
-            Messages for {{ course_name }}
+            Messages for {{ course.course_name }}
           </h3>
 
           <ul id="messages" style="text-align: center">
@@ -133,7 +133,7 @@
                   
                   <input   type="hidden" id="sender" name="sender" value="{{username}}" />
                     <input style="margin-top: 2%" type="text" id="content" name="content" placeholder="Add Message" required />
-                    <input type="hidden" name="course_name" value="{{ course_name }}">
+                    <input type="hidden" name="course_name" value="{{ course.course_name }}">
                     
                 </div>
                 <button class="btn btn-primary btn-sm btn-block" type="submit" style="background: #96bbfa; color: black; margin-top: 2%">Send</button>
