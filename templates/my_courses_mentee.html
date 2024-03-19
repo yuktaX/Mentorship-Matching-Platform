@@ -87,14 +87,9 @@
         <h1 class="logo me-auto"><a href="/">Mentify</a></h1>
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
-            <li>
-              <a class="nav-link scrollto active" href="{{ url_for('dashboard_mentee', username=username) }}"
-                >Home</a
-              >
-            </li>
-            <li><a href="{{ url_for('profile_mentee', username=username,msg='')}}">Profile</a></li>
-            <li><a href="">My Courses</a></li>
-            <li><a href="">Logout</a></li>
+            <li><a class="nav-link scrollto active" href="{{ url_for('dashboard_mentee', username=username) }}">Home</a></li>
+            <li><a href="{{ url_for('my_courses', username=username,msg='') }}">My Courses</a></li>
+            <li><a href="{{ url_for('logout')}}">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
         </nav>
@@ -157,13 +152,16 @@
                 <div class="icon" style="background: rgb(209, 237, 255)">
                   <i class="bi bi-briefcase" style="color: #1985f0"></i>
                 </div>
-                <h3 class="title"><a href="">Course Name</a></h3>
-                <h5 style="font-size: small">Course Duration:</h5>
-                <h5 style="font-size: small">Price: 1000 INR</h5>
-                <p class="description">description of course</p>
+                {% for course_list in courses %}
+                <h3 class="title"><a href="/messages/{{course_list.course_name}}/{{course_list.course_start}}/{{course_list.course_end}}/{{course_list.course_desc}}/{{username}}">{{ course_list.course_name }}</a></h3>
+                <h5 style="font-size: small">Course starts on : {{course_list.course_start}}</h5>
+                <h5 style="font-size: small">Course ends on : {{course_list.course_end}}</h5>
+                <h5 style="font-size: small">Price: {{course_list.course_price}} INR</h5>
+                <p class="description">{{course_list.course_desc}}</p>
+                {% endfor %}
               </div>
             </div>
-            <div
+            <!--<div
               class="col-md-6 col-lg-4 wow bounceInUp"
               data-aos="zoom-in"
               data-aos-delay="100"
@@ -196,7 +194,7 @@
           </div>
         </div>
       </section>
-      <!-- End Services Section -->
+       End Services Section -->
     </main>
 
     <!-- ======= Footer ======= -->
