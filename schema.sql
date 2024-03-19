@@ -55,7 +55,8 @@ CREATE TABLE mentorship_prog (
     status VARCHAR(10),
     FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id),
     FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id),
-    FOREIGN KEY (category_id) REFERENCES category(category_id)
+    FOREIGN KEY (category_id) REFERENCES category(category_id),
+    index(course_name)
 );
 
 CREATE TABLE course (
