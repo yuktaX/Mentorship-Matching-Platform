@@ -90,9 +90,8 @@
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
             <li><a class="nav-link scrollto active" href="{{ url_for('dashboard_mentee', username=username) }}">Home</a></li>
-            <li><a href="{{ url_for('logout')}}">Programs</a></li>
             <li><a href="{{ url_for('profile_mentee', username=username,msg='') }}">Profile</a></li>
-            <li><a href="{{ url_for('logout')}}">My Courses</a></li>
+            <li><a href="{{ url_for('my_courses', username=username,msg='') }}">My Courses</a></li>
             <li><a href="{{ url_for('logout')}}">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
