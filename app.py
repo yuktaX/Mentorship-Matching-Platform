@@ -512,6 +512,7 @@ def handle_new_message(data):
     sender = data['sender']
     content = data['content']
     course_name = data['course_name']
+
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("INSERT INTO messages(sender, content, course_name) VALUES (%s, %s, %s)",
                    (sender, content, course_name))
@@ -576,25 +577,29 @@ def handle_new_message(data):
 #         cursor.execute(query, (tag,))
 #         data.extend(cursor.fetchall())
 
-#     connection.close()
+#     if search_term:
+#         print("Search Term:", search_term)
+#         print("Search Type:", search_type)
 
-#     return render_template('index.html', data=data)
+#         if search_type == 'mentor':
+#             query += " AND mentor.mentor_name LIKE %s"
+#         elif search_type == 'course':
+#             query += " AND course.course_name LIKE %s"
+#         parameters.append("%" + search_term + "%")
 
+#     query += f" ORDER BY {sort_option}"
 
-# @app.route('/sort')
-# def sort():
-#     """Sorts data based on the number of registrations in descending order.(popularity)"""
-#     connection = connect_to_database()
-#     if connection is None:
-#         return "Error connecting to database"
+#     cursor.execute(query, parameters)
 
-#     cursor = connection.cursor()
-#     # Sort by number of registrations in descending order
-#     cursor.execute("SELECT * FROM course ORDER BY no_of_registrations DESC")
+#     print("Final query:", query)
+#     print("Parameters:", parameters)
+#     print(selected_tag)
+#     cursor.execute(query, parameters)
 #     data = cursor.fetchall()
-#     connection.close()
-
-#     return render_template('index.html', data=data)
+#     # if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#     #     return jsonify(data=data,tag=tag)  # Return JSON response for AJAX request
+#     # else:
+#     return render_template('dashboard_mentee.html', data=data, tag=tag, selected_filter=selected_tag, sort_option=sort_choice, search_term=search_term, search_type=search_type)
 
 @app.route('/logout')
 def logout():

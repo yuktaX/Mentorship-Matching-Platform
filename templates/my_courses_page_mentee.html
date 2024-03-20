@@ -49,16 +49,16 @@
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
             <li>
-              <a class="nav-link scrollto" href="{{url_for('dashboard_mentee', username=username)}}">Home</a>
+              <a class="nav-link scrollto" href="{{ url_for('dashboard_mentee', username=username) }}">Home</a>
             </li>
             <li>
-              <a class="nav-link scrollto" href="dashboard_mentee.html"
+              <a class="nav-link scrollto" href="{{ url_for('dashboard_mentee', username=username) }}"
                 >Programs</a
               >
             </li>
             <li><a href="{{ url_for('profile_mentee', username=username,msg='') }}">Profile</a></li>
-            <li><a href="my_courses_mentee.html">My Courses</a></li>
-            <li><a href="">Logout</a></li>
+            <li><a href="{{ url_for('my_courses', username=username,msg='') }}">My Courses</a></li>
+            <li><a href="{{ url_for('logout')}}">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
         </nav>
@@ -72,22 +72,22 @@
           <header
             style="text-align: center; background-color: rgb(190, 238, 255)"
           >
-            <h2>Course Name</h2>
+            <h2>{{course.course_name}}</h2>
           </header>
 
-          <div>Start Date:</div>
-          <div>End Date:</div>
+          <div>Start Date:{{course.course_start}}</div>
+          <div>End Date:{{course.course_end}}</div>
 
           <br />
 
           <div class="container" style="text-align: center">
-            Enter Description here
+            {{course.course_desc}}
           </div>
 
           <br />
 
           <div style="text-align: center; font-style: italic">
-            Status: Enrolled
+            Status: {{course.course_status}}
           </div>
 
           <br />
@@ -115,7 +115,7 @@
           <h3
             style="text-align: center; background-color: #96bbfa; padding: 5px"
           >
-            Messages for {{ course_name }}
+            Messages for {{ course.course_name }}
           </h3>
 
           <ul id="messages" style="text-align: center">
@@ -133,7 +133,7 @@
                   
                   <input   type="hidden" id="sender" name="sender" value="{{username}}" />
                     <input style="margin-top: 2%" type="text" id="content" name="content" placeholder="Add Message" required />
-                    <input type="hidden" name="course_name" value="{{ course_name }}">
+                    <input type="hidden" name="course_name" value="{{ course.course_name }}">
                     
                 </div>
                 <button class="btn btn-primary btn-sm btn-block" type="submit" style="background: #96bbfa; color: black; margin-top: 2%">Send</button>

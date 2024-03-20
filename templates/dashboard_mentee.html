@@ -222,93 +222,61 @@
           </header>
 
           <div class="justify-content-center align-items-center">
-            <form method="" action="">
+            <form method="POST" action="/search_sort_filter">
               <label for="filter" class="border-transparent"></label>
 
-              <select name="filter" id="filter">
-                <option value="none">Filter - None</option>
-                <option value="valuation">Tag A</option>
-                <option value="equity">Tag B</option>
-                <option value="investment">Tag C</option>
-                <option value="revenue">Tag D</option>
-                <option value="profit">Tag E</option>
+              <select name="filter" id="filter-form">
+                <option value="none" {% if selected_filter == 'none' %}selected{% endif %}>Filter - None</option>
+                {% for tag_list in tags %}
+                <option value="{{ tag_list.tag_name }}" {% if selected_filter == tag_list.tag_name %}selected{% endif %}>{{ tag_list.tag_name }}</option>
+                {% endfor %}
               </select>
-
-              <label for="sort" class="border-transparent"></label>
-
-              <select name="sort" id="sort">
-                <option value="valuation">Sort - None</option>
-                <option value="valuation">Most popular</option>
-                <option value="equity">Low to high price</option>
-                <option value="investment">High to low price</option>
+              
+              <select name="sort" id="sort-form">
+                <option value="valuation" {% if sort_option == 'valuation' %}selected{% endif %}>Sort - None</option>
+                <option value="valuation" {% if sort_option == 'valuation' %}selected{% endif %}>Most popular</option>
+                <option value="equity" {% if sort_option == 'equity' %}selected{% endif %}>Low to high price</option>
+                <option value="investment" {% if sort_option == 'investment' %}selected{% endif %}>High to low price</option>
               </select>
-
+              
               <input
-               type="text"
-               name="search_term" 
-               style="
-               background-color: rgb(216, 237, 250);
-               border-color: #000000;
-               border-width: 1px;
+                type="text"
+                name="search_term"
+                id="search-form" 
+                style="
+                background-color: rgb(216, 237, 250);
+                border-color: #000000;
+                border-width: 1px;
                 "
-               placeholder="Search.."
+                placeholder="Search.."
+                value="{{ search_term }}"
               />
               <select name="search_type">
-              <option value="mentor">Search by mentor</option>
-              <option value="course">Search by course</option>
+                <option value="mentor" {% if search_type == 'mentor' %}selected{% endif %}>Search by mentor</option>
+                <option value="course" {% if search_type == 'course' %}selected{% endif %}>Search by course</option>
               </select>
+              
              <button type="submit">Apply</button>
             </form>
           </div>
-
+          
           <br />
 
-          <div class="row g-5">
-            <div
-              class="col-md-6 col-lg-4 wow bounceInUp"
-              data-aos="zoom-in"
-              data-aos-delay="100"
-            >
-              <div class="box">
-                <div class="icon" style="background: rgb(209, 237, 255)">
-                  <i class="bi bi-briefcase" style="color: #1985f0"></i>
+         <div class="row g-5">
+            {% for course in data %}
+            <div class="col-md-6 col-lg-4 wow bounceInUp" data-aos="zoom-in" data-aos-delay="100">
+                <div class="box">
+                    <div class="icon" style="background: rgb(209, 237, 255)">
+                        <!-- Add appropriate icon or image for the course -->
+                    </div>
+                    <h3 class="title"><a href="">{{ course.course_name }}</a></h3>
+                    <h5 style="font-size: small">Course starts: {{ course.course_start }}</h5>
+                    <h5 style="font-size: small">Price: {{ course.course_price }} INR</h5>
+                    <p class="description">{{ course.course_desc }}</p>
+                    
                 </div>
-                <h3 class="title"><a href="">Course Name</a></h3>
-                <h5 style="font-size: small">Course Duration:</h5>
-                <h5 style="font-size: small">Price: 1000 INR</h5>
-                <p class="description">description of course</p>
-              </div>
             </div>
-            <div
-              class="col-md-6 col-lg-4 wow bounceInUp"
-              data-aos="zoom-in"
-              data-aos-delay="100"
-            >
-              <div class="box">
-                <div class="icon" style="background: rgb(209, 237, 255)">
-                  <i class="bi bi-bar-chart" style="color: #1985f0"></i>
-                </div>
-                <h3 class="title"><a href="">Course Name</a></h3>
-                <h5 style="font-size: small">Course Duration:</h5>
-                <h5 style="font-size: small">Price: 1000 INR</h5>
-                <p class="description">description of course</p>
-              </div>
-            </div>
-            <div
-              class="col-md-6 col-lg-4 wow bounceInUp"
-              data-aos="zoom-in"
-              data-aos-delay="100"
-            >
-              <div class="box">
-                <div class="icon" style="background: rgb(209, 237, 255)">
-                  <i class="bi bi-book" style="color: #1985f0"></i>
-                </div>
-                <h3 class="title"><a href="">Course Name</a></h3>
-                <h5 style="font-size: small">Course Duration:</h5>
-                <h5 style="font-size: small">Price: 1000 INR</h5>
-                <p class="description">description of course</p>
-              </div>
-            </div>
+            {% endfor %}
           </div>
         </div>
       </section>
