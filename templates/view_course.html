@@ -128,6 +128,7 @@
                     <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Start Date</b></label><input type="date" class="form-control" placeholder="" value="{{course['course_start']}}" readonly></div>
                     <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program End Date</b></label><input type="date" class="form-control" placeholder="" value="{{course['course_end']}}"readonly></div>
                     <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Price</b></label><input type="text" class="form-control" placeholder="" name="price" value="{{course['course_price']}}"readonly></div>
+                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Max mentees </b></label><input type="number" class="form-control" placeholder="" name="max_mentee" value="{{course['max_limit']}}"readonly></div>
                 </div>
 
                 <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Program Description</i></label><textarea type="text" class="form-control" placeholder="Kindly tell us about what guidance and how this program offers" value="" readonly>{{course['course_desc']}}</textarea></div> <br>
@@ -154,6 +155,9 @@
                   <button class="btn profile-button" type="submit" style="background: rgb(168, 37, 37); color: #ffffff;" name="reject">Reject course</button></div>
                   {%elif viewer=='mentee'%}
                   <div class="mt-5 text-center"><button class="btn profile-button" type="submit" style="color: #ffffff;" name="register">Register</button></div>
+                  {%elif viewer=='mentor'%}
+                  <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Course approval status</b></label><input type="text" class="form-control" placeholder="" value="{{course['course_status']}}" readonly></div>
+                  <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Admin comments on course</i></label><textarea type="text" class="form-control" placeholder="Admin comments" value="" readonly>{{course['admin_comment']}}</textarea></div> <br>
                   {%endif%}
                 </form>
             </div>

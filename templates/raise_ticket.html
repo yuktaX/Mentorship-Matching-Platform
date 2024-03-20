@@ -37,45 +37,6 @@
     <!-- Template Main CSS File -->
     <link href="../static/assets/css/style.css" rel="stylesheet" />
   </head>
-  <style>
-    li::marker {
-      font-size: 0;
-    }
-
-    section {
-      padding: 60px 0;
-    }
-
-    .carousel-item {
-      height: 32rem;
-      background: rgb(209, 237, 255);
-      color: rgb(0, 0, 0);
-      position: relative;
-      background-position: center;
-      background-size: 10px;
-    }
-    .overlay-image {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      top: 0;
-      background-position: right center;
-      background-repeat: no-repeat;
-      background-size: 30%;
-      margin-right: 40px;
-    }
-
-    a {
-      text-decoration: inherit;
-      color: inherit;
-      text-decoration: None;
-    }
-    a:hover {
-      text-decoration: none;
-      color: inherit;
-    }
-  </style>
 
   <body>
     <!-- ======= Header ======= -->
@@ -88,10 +49,15 @@
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
             <li>
-              <a class="nav-link scrollto" href="/">My Programs</a>
+              <a class="nav-link scrollto" href="{{url_for('dashboard_mentee', username=username)}}">Home</a>
             </li>
-            <li><a href="{{url_for('profile_mentor', username=username)}}">Profile</a></li>
-            <li><a href="{{url_for('create_program', username=username)}}">Create Program</a></li>
+            <li>
+              <a class="nav-link scrollto" href="dashboard_mentee.html"
+                >Programs</a
+              >
+            </li>
+            <li><a href="{{ url_for('profile_mentee', username=username,msg='') }}">Profile</a></li>
+            <li><a href="my_courses_mentee.html">My Courses</a></li>
             <li><a href="">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
@@ -104,11 +70,10 @@
       <section id="services" class="services section-bg" style="margin-top: 5%">
         <div class="container" data-aos="fade-up">
           <header class="section-header">
-            <h3>Create New Mentorship Program</h3>
-            <h4>{{msg}}</h4>
+            <h3>Raise a complaint</h3>
+            <h5>{{msg}}</h5>
             <p>
-              Kindly fill in your proposal for a new program. After approval by
-              the Mentify Team, we will contact you for further steps.
+              Kindly fill in this form with the issue you are facing. Our team will get back to you as soon as possible.
             </p>
         </header>
 
@@ -116,36 +81,11 @@
         <div class="col-md-12">
             <div class="p-3 py-5">
                 <div class="d-flex justify-content-center align-items-center mb-3 text">
-                    <h2 style="text-align: center;">Proposal Form</h2>
+                    <h2 style="text-align: center;">Raise Complaint</h2>
                 </div>
-                <form action="" method="post">
-                <div class="row mt-2">
-                    <div class="col-md-12"><label class="labels"><b>Course Name</b></label><input type="text" class="form-control" placeholder="Full Name" value="" name="course_name"></div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Start Date</b></label><input type="date" class="form-control" placeholder="" name="start_date"></div>
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program End Date</b></label><input type="date" class="form-control" placeholder="" name="end_date"></div>
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Program Price</b></label><input type="text" class="form-control" placeholder="" name="price"></div>
-                    <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Max mentee</b></label><input type="number" class="form-control" placeholder="" name="max_mentee"></div>
-                </div>
+                <form action="" method="POST">
 
-                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Program Description</i></label><textarea type="text" class="form-control" placeholder="Kindly tell us about what guidance and how this program offers" name="desc"></textarea></div> <br>
-
-                <p>Kindly select relevant tags for the course</p>
-                                
-                
-                <div class="col-md-12">
-                  {%for tag in tags%}
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="{{tag['tag_name']}}" >
-                        <label class="form-check-label" for="defaultCheck1">
-                            {{tag['tag_name']}}
-                        </label>
-                    </div>
-                    {%endfor%}
-                    
-                </div>
-                
+                <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Description of the problem</i></label><textarea type="text" class="form-control" placeholder="Kindly tell us about the issue at hand." name="complaint_desc"></textarea></div> <br>
 
                 <div class="mt-5 text-center"><button class="btn profile-button" type="submit" style="color: #ffffff;">Submit</button></div>
                 </form>

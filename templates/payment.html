@@ -13,6 +13,7 @@
             
             <h2>Payment Gateway</h2>
             <div class="form">
+                <form action="" method="post">
                 <div class="card space icon-relative">
                     <label class="label">Card holder:</label>
                     <input type="text" class="input" name="card_holder" placeholder="Card Holder Name">
@@ -35,9 +36,12 @@
                         <i class="fa-solid fa-lock"></i>
                     </div>
                 </div>
-                <div class="btn">
+                
+                    <button class="btn" type="submit">
                     pay Rs {{amount}}
-                </div>
+                </button>
+                
+            </form>
             </div>
         </div>
     </div>

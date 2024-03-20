@@ -7,7 +7,8 @@ import os
 from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO, emit
 import random
-import search_and_filter.py
+from datetime import datetime
+#import search_and_filter.py
 
  
 app = Flask(__name__)
@@ -47,7 +48,7 @@ def send_email(sender,receiver,subject,message):
     server = smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
 
-    server.login(sender,"xxxxxxxxxxxxxx")               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
+    server.login(sender,"xxxxxxxxxxxx")               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
     server.sendmail(sender,receiver,text)
     print("Email has been sent to : ", receiver)
 
@@ -90,10 +91,6 @@ def process_login():
                 msg="incorrect username or password"
                 return render_template("login.html",msg=msg)
             
-#@app.route('\signup_process',methods=['GET','POST'])
-#def signup_process():
- #   msg=''
-  #  if request.method=='POST'and 'Full name' in request.form and 'Email address' in request.form and 'Phone number' in request.form  and 
 
 
 @app.route('/signup_main',methods=['GET','POST'])
@@ -116,7 +113,10 @@ def dashboard_mentor(username):
     cursor.execute(
             'SELECT * FROM mentor WHERE username = % s ', (username,) )
     mentor=cursor.fetchone()
-    return render_template("dashboard_mentor.html",mentor=mentor,username=mentor['username'])
+    cursor.execute(
+            'SELECT * FROM course WHERE mentor_id = % s ', (mentor['mentor_id'],) )
+    courses=cursor.fetchall()
+    return render_template("dashboard_mentor.html",mentor=mentor,username=mentor['username'],courses=courses)
 
 
 
@@ -294,9 +294,10 @@ def create_program(username):
         price=request.form['price']
         mentor_id=mentor_id['mentor_id']
         course_desc=request.form['desc']
+        max_mentee=request.form['max_mentee']
         print(mentor_id)
         cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('INSERT INTO course(mentor_id, course_name, course_start, course_end, course_price,course_status,course_desc) VALUES (%s, %s, %s, %s, %s,%s,%s)', (mentor_id, course_name, start_date, end_date, price,'unverified',course_desc))
+        cursor.execute('INSERT INTO course(mentor_id, course_name, course_start, course_end, course_price,course_status,course_desc,max_limit) VALUES (%s, %s, %s, %s, %s,%s,%s,%s)', (mentor_id, course_name, start_date, end_date, price,'unverified',course_desc,max_mentee))
         mysql.connection.commit()
         cursor.execute('SELECT * FROM course WHERE course_name = %s',(course_name,))
         course=cursor.fetchone()
@@ -380,7 +381,11 @@ def admin():
     unapproved_mentors=cursor.fetchall()
     cursor.execute('SELECT * FROM course WHERE course_status = %s', ('unverified',))
     unapproved_courses=cursor.fetchall()
-    return render_template("admin.html",mentors=unapproved_mentors,courses=unapproved_courses)
+    cursor.execute("SELECT * FROM mentee_complaints WHERE complaint_status='pending'")
+    mentee_pending_complaints = cursor.fetchall()
+    cursor.execute("SELECT * FROM mentor_complaints WHERE complaint_status='pending'")
+    mentor_pending_complaints = cursor.fetchall()
+    return render_template("admin.html",mentors=unapproved_mentors,courses=unapproved_courses,mentee_complaints=mentee_pending_complaints,mentor_complaints=mentor_pending_complaints)
 
 @app.route('/add_tag',methods=['GET','POST'])
 def add_tag():       
@@ -398,6 +403,7 @@ def add_tag():
 def view_course():
     viewer = request.args.get('viewer')
     course_id = int(request.args.get('course_id'))
+    mentee_id=int(request.args.get('mentee_id'))
 
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM course WHERE course_id = %s', (course_id,))
@@ -411,8 +417,87 @@ def view_course():
         cursor.execute('SELECT * FROM tag WHERE tag_id=%s',(tag['tag_id'],))
         tag_new=cursor.fetchone()
         tags.append(tag_new)
+    if viewer=='admin':
+        return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0)
+    elif viewer=='mentee':
+        if not mentee_id==0:
+            return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=mentee_id)
+    elif viewer=='mentor':
+        return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0)
 
-    return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags)
+    return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0)
+
+
+@app.route('/process_viewer_request',methods=['GET','POST'])
+def process_viewer_request():
+    course_id=int(request.args.get('course_id'))
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    if request.method=='POST':
+        if 'admin_comment' in request.form:
+            admin_comment=request.form['admin_comment']
+            print(admin_comment)
+            if 'accept' in request.form:
+                cursor.execute('UPDATE course SET admin_comment= %s,course_status=%s WHERE course_id=%s',(admin_comment,'verified',course_id))
+                mysql.connection.commit()
+            elif 'reject' in request.form:
+                cursor.execute('UPDATE course SET admin_comment=%s AND course_status=%s WHERE course_id=%s',(admin_comment,'rejected',course_id))
+                mysql.connection.commit()
+            return redirect(url_for('admin'))
+        elif 'register' in request.form:
+            amount=request.form['price']
+            return redirect(url_for('payment',+ f'?amount={amount}&course_id={course_id}'))
+
+@app.route('/payment',methods=['GET','POST'])
+def payment():
+    amount = request.args.get('amount')
+    mentee_id = int(request.args.get('mentee_id'))
+    course_id=int(request.args.get('course_id'))
+    if request.method=='POST':
+        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('INSERT INTO course_mentee(mentee_id,course_id) VALUES(%s,%s)',(mentee_id,course_id))
+        mysql.connection.commit()
+        cursor.execute('SELECT * FROM mentee WHERE mentee_id=%s',(mentee_id,))
+        mentee=cursor.fetchone()
+        cursor.execute('SELECT * FROM course WHERE course_id=%s',(course_id,))
+        course=cursor.fetchone()
+        cursor.execute('SELECT * FROM mentor WHERE mentor_id=%s',(course['mentor_id'],))
+        mentor=cursor.fetchone()
+        send_email("vaishnoviarun7060@gmail.com",mentee['email_id'],"Course registration successful",f"Dear {mentee['mentee_name']}, you have successfully registered for the course {course['course_name']} conducted by mentor {mentor['mentor_name']}.\n Login to your Mentify account to check out course details!")
+        send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Course registration",f"Dear {mentor['mentor_name']}, Mentee {mentee['mentee_name']} has enrolled for your course {course['course_name']}. You may now mentor your mentee and help him/her achieve their goals!!Login to your mentify account!!")
+        return redirect(url_for('dashboard_mentee',username=mentee['username']))
+    
+
+    return render_template('payment.html',amount=amount)             
+
+@app.route('/submit_mentee_complaint/<int:mentee_id>', methods=['GET','POST'])
+def submit_mentee_complaint(mentee_id):
+    if request.method=='POST':
+        complaint_date = datetime.now()
+        complaint_desc = request.form['complaint_desc']    
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("INSERT INTO mentee_complaints (mentee_id, complaint_date, complaint_desc) VALUES (%s, %s, %s)", (mentee_id, complaint_date, complaint_desc))
+        mysql.connection.commit()
+        cursor.execute("SELECT * FROM mentee WHERE mentee_id=%s",(mentee_id,))
+        mentee=cursor.fetchone()
+        send_email("vaishnoviarun7060@gmail.com",mentee['email_id'],"Complaint registered successfully",f"Dear {mentee['mentee_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
+        return render_template('raise_ticket.html',msg='Complaint successfully submitted')
+        
+    return render_template('raise_ticket.html',msg='')
+
+@app.route('/submit_mentor_complaint/<int:mentor_id>', methods=['GET','POST'])
+def submit_mentor_complaint(mentor_id):
+    if request.method=='POST':
+        complaint_date = datetime.now()
+        complaint_desc = request.form['complaint_desc']    
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("INSERT INTO mentor_complaints (mentor_id, complaint_date, complaint_desc) VALUES (%s, %s, %s)", (mentor_id, complaint_date, complaint_desc))
+        mysql.connection.commit()
+        cursor.execute("SELECT * FROM mentor WHERE mentor_id=%s",(mentor_id,))
+        mentor=cursor.fetchone()
+        send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Complaint registered successfully",f"Dear {mentor['mentor_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
+        return render_template('raise_ticket.html',msg='Complaint successfully submitted')
+        
+    return render_template('raise_ticket.html',msg='')
 
 @app.route('/messages/<course_name>/<username>')
 def messages(course_name,username):
@@ -432,32 +517,6 @@ def handle_new_message(data):
                    (sender, content, course_name))
     mysql.connection.commit()
     emit('new_message', {'sender': sender, 'content': content})
-
-@app.route('/process_viewer_request',methods=['GET','POST'])
-def process_viewer_request():
-    course_id=int(request.args.get('course_id'))
-    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    if request.method=='POST':
-        if 'admin_comment' in request.form:
-            admin_comment=request.form['admin_comment']
-            print(admin_comment)
-            if 'accept' in request.form:
-                cursor.execute('UPDATE course SET admin_comment= %s,course_status=%s WHERE course_id=%s',(admin_comment,'verified',course_id))
-                mysql.connection.commit()
-            elif 'reject' in request.form:
-                cursor.execute('UPDATE course SET admin_comment=%s AND course_status=%s WHERE course_id=%s',(admin_comment,'rejected',course_id))
-                mysql.connection.commit()
-            return redirect(url_for('admin'))
-        elif 'register' in request.form:
-            amount=request.form['price']
-            return redirect(url_for('payment',amount=amount))
-
-@app.route('/payment/<int:amount>',methods=['GET','POST'])
-def payment(amount):
-    return render_template('payment.html',amount=amount)             
-
-
-
 
 # @app.route('/')
 # def index():
