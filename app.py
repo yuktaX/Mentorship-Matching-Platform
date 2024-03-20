@@ -105,7 +105,10 @@ def dashboard_mentee(username):
     mentee=cursor.fetchone()
     print(mentee)
     mentee_name=mentee['mentee_name']
-    return render_template("dashboard_mentee.html",mentee=mentee_name,username=mentee['username'])
+
+    cursor.execute('SELECT * FROM tag')  
+    tags = cursor.fetchall()
+    return render_template("dashboard_mentee.html",mentee=mentee_name,username=mentee['username'],tags=tags,selected_filter = 'none')
 
 @app.route('/dashboard_mentor/<username>')
 def dashboard_mentor(username):
@@ -506,6 +509,64 @@ def messages(course_name,username):
             'SELECT * FROM messages where course_name = %s',(course_name,))
         messages = cursor.fetchall()
         return render_template('my_courses_page_mentee.html',course_name=course_name,username=username,messages=messages)
+
+@app.route('/search_sort_filter', methods=['POST'])
+def search_sort_filter():
+    """Sorts, searches, and filters data based on the provided parameters."""
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM tag')
+    tag = cursor.fetchall()
+
+    parameters = []
+    sort_option = "no_of_registrations DESC"
+    query = "SELECT course.*, mentor.mentor_name FROM course JOIN mentor ON course.mentor_id = mentor.mentor_id"
+    sort_choice = request.form['sort']
+
+    if 'sort' in request.form:
+        if sort_choice == 'valuation':
+            sort_option = "no_of_registrations DESC"
+        elif sort_choice == 'equity':
+            sort_option = "course_price ASC"
+        elif sort_choice == 'investment':
+            sort_option = "course_price DESC"
+
+    selected_tag = request.form['filter']
+    if 'filter' in request.form:
+        print("tag : ", selected_tag)
+        if selected_tag != 'none':
+            query += " JOIN course_tag_relation ON course.course_id = course_tag_relation.course_id"
+            query += " JOIN tag ON course_tag_relation.tag_id = tag.tag_id"
+            query += " WHERE tag.tag_name = %s"
+            parameters.append(selected_tag)
+    else:
+        query += " WHERE 1=1"  # Ensuring the WHERE clause is present even if no tag is selected
+
+    search_term = request.form.get('search_term')
+    search_type = request.form.get('search_type')
+
+    if search_term:
+        print("Search Term:", search_term)
+        print("Search Type:", search_type)
+
+        if search_type == 'mentor':
+            query += " AND mentor.mentor_name LIKE %s"
+        elif search_type == 'course':
+            query += " AND course.course_name LIKE %s"
+        parameters.append("%" + search_term + "%")
+
+    query += f" ORDER BY {sort_option}"
+
+    cursor.execute(query, parameters)
+
+    print("Final query:", query)
+    print("Parameters:", parameters)
+    print(selected_tag)
+    cursor.execute(query, parameters)
+    data = cursor.fetchall()
+    # if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    #     return jsonify(data=data,tag=tag)  # Return JSON response for AJAX request
+    # else:
+    return render_template('dashboard_mentee.html', data=data, tags=tag, selected_filter=selected_tag, sort_option=sort_choice, search_term=search_term, search_type=search_type)
  
 @socketio.on('new_message')
 def handle_new_message(data):
@@ -519,87 +580,6 @@ def handle_new_message(data):
     mysql.connection.commit()
     emit('new_message', {'sender': sender, 'content': content})
 
-# @app.route('/')
-# def index():
-#   """Renders the main page with initial data."""
-#   connection = connect_to_database()
-#   if connection is None:
-#     return "Error connecting to database"
-
-#   cursor = connection.cursor()
-#   cursor.execute("SELECT * FROM your_table")  # Replace with your table name
-#   data = cursor.fetchall()
-#   connection.close()
-
-#   return render_template('index.html', data=data)
-
-# @app.route('/search', methods=['POST'])
-# def search():
-#    """Searches the database based on mentor or course name."""
-#     connection = connect_to_database()
-#     if connection is None:
-#         return "Error connecting to database"
-
-#     mentor_name = request.form['mentor_name']
-#     cursor = connection.cursor()
-#     # Join with mentor table to get mentor name
-#     cursor.execute("""
-#         SELECT course.*, mentor.mentor_name
-#         FROM course
-#         JOIN mentor ON course.mentor_id = mentor.mentor_id 
-#         WHERE mentor.mentor_name LIKE %s OR course.course_name LIKE %s
-#     """,("%" + search_term + "%", "%" + search_term + "%"))
-#     data = cursor.fetchall()
-#     connection.close()
-
-#     return render_template('index.html', data=data)
-
-# @app.route('/filter', methods=['POST'])
-# def filter():
-#     """Filters data based on selected tags."""
-#     connection = connect_to_database()
-#     if connection is None:
-#         return "Error connecting to database"
-
-#     selected_tags = request.form.getlist('tags')
-
-#     cursor = connection.cursor()
-
-#     # Build dynamic query with OR clause for filtering based on tags
-#     query = """
-#         SELECT * FROM course
-#         WHERE %s IN (tag1, tag2, tag3, tag4, tag5)
-#     """
-
-#     # Execute the query for each selected tag
-#     data = []
-#     for tag in selected_tags:
-#         cursor.execute(query, (tag,))
-#         data.extend(cursor.fetchall())
-
-#     if search_term:
-#         print("Search Term:", search_term)
-#         print("Search Type:", search_type)
-
-#         if search_type == 'mentor':
-#             query += " AND mentor.mentor_name LIKE %s"
-#         elif search_type == 'course':
-#             query += " AND course.course_name LIKE %s"
-#         parameters.append("%" + search_term + "%")
-
-#     query += f" ORDER BY {sort_option}"
-
-#     cursor.execute(query, parameters)
-
-#     print("Final query:", query)
-#     print("Parameters:", parameters)
-#     print(selected_tag)
-#     cursor.execute(query, parameters)
-#     data = cursor.fetchall()
-#     # if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-#     #     return jsonify(data=data,tag=tag)  # Return JSON response for AJAX request
-#     # else:
-#     return render_template('dashboard_mentee.html', data=data, tag=tag, selected_filter=selected_tag, sort_option=sort_choice, search_term=search_term, search_type=search_type)
 
 @app.route('/logout')
 def logout():
