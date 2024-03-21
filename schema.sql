@@ -149,6 +149,14 @@ CREATE TABLE messages (
     FOREIGN KEY (course_name) REFERENCES course(course_name)
 );
 
+CREATE TABLE feedback (
+    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
+    course_id INT,
+    rating INT,
+    feedback_comments VARCHAR(255),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
+);
+
 
 
 INSERT INTO mentee(mentee_name,email_id,username,pass_word) VALUES ('Mimi','vaishnoviarun7060@gmail.com','mimi','abcd');
