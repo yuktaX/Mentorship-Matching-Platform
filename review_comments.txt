@@ -1,0 +1,128 @@
+class Mentee:
+	int id;
+	string name;
+	string username;
+	string password;
+	
+class Mentor:
+	string qualification = None;
+	
+	
+class User:
+	string username
+	string password
+
+views.py
+
+@route()
+def login_view():
+	username = ..
+	password = ..
+	
+	user = User(username, password)
+	if validate_mentee_login(user) is successeful:
+		# redirect 
+	else if validate_mentor_login(user) is successeful:
+		# redirect
+	else:
+		# show an appropriate error message
+	
+def signup_view():
+	new_mentee = Mentee()
+	mentee.name = request.get('name')
+	mentee.contact_no = request.get('contact_no')
+	..
+	
+
+	
+
+
+controller.py
+
+def validate_mentee_login(user):
+	# connect to database
+	# construct sql query
+	# execute sql query
+	return success/failure
+	
+def validate_mentor_login(user):
+	# connect to database
+	# construct sql query
+	# execute sql query
+	return success/failure
+	
+def register_mentee(new_mentee):
+	# connect to database
+	# construct sql query
+	# execute
+	return success/failure
+	
+1. Feedback
+2. search and filter
+3. review changes
+4. report
+5. chat
+
+- Feedback functionality
+- Chat functionality integration
+- Search and filter integration
+
+- Review changes
+
+- Report
+
+utils.py
+
+documentation example
+def send_email(sender,receiver,subject,message):
+	"""
+	Sends confirmation mail to the ``receiver``
+	@param sender: Senders email address
+	@param receiver: ..
+	
+	"""
+	
+search_and_filter.py
+- Remove hard-coding
+- Remove debug statements
+- Documentation of search_sort_filter.py is not comprehensive. Give a general overview of how things work. For example, the functionality of sort type and sort options is unclear
+- Lets rewrite the function as follows:
+
+class SearchQuery:
+	filters
+	sort order
+	
+def search:
+	search_query_inst = SearchQuery.default
+	add_sort(request, search_query_inst)		-> Configues sort options on the search_query_inst
+	add_filters(request, search_query_inst)		-> Configures filters on the search_query_inst
+	
+	return execute_search_query(search_query_inst)
+	
+complaint.py
+- lets create classes for mentee/mentor complaints
+- Add method docs
+- Functionality of admin() endpoint is unclear
+- Add similar refactoring as we had discussed for app.py, that is, separate out the views and controller
+- lets add a utility function for execute_query. This will reduce the code duplication at all places where a database transaction is made
+
+utils.py
+def execute_query(query: string):
+	cursor = db.cursor()
+    cursor.execute(query)
+    db.commit()
+    cursor.close()
+	
+app.py:
+- create_program -> functionality of this endpoint is not clear. lets use a better name
+- lets group login/signup/forgot_password/log out together since these are related functionalities
+- search_sort_filter is repeated here
+- lets discuss how the chatting works
+- process_viewer_request -> naming unclear
+- admin endpoint -> functionality is not clear
+- forgot_password -> otp generation and emailing functionality should reside in the controller file
+
+
+	
+	
+
