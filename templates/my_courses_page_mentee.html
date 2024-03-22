@@ -75,8 +75,8 @@
             <h2>{{course.course_name}}</h2>
           </header>
 
-          <div>Start Date:{{course.course_start}}</div>
-          <div>End Date:{{course.course_end}}</div>
+          <div class="container" style="text-align: center">Start Date:{{course.course_start}}</div>
+          <div class="container" style="text-align: center">End Date:{{course.course_end}}</div>
 
           <br />
 
@@ -133,10 +133,11 @@
                   
                   <input   type="hidden" id="sender" name="sender" value="{{username}}" />
                     <input style="margin-top: 2%" type="text" id="content" name="content" placeholder="Add Message" required />
-                    <input type="hidden" name="course_name" value="{{ course.course_name }}">
+                    <input type="hidden" name="course_id" value="{{ course.course_id }}">
                     
                 </div>
-                <button class="btn btn-primary btn-sm btn-block" type="submit" style="background: #96bbfa; color: black; margin-top: 2%">Send</button>
+                <br>
+                <button class="btn btn-primary btn btn-block" type="submit" style="background: #96bbfa; color: black; margin-top: 2%">Send</button>
             </div>
         </form>
 
@@ -162,9 +163,9 @@
                   event.preventDefault();
                   var sender = document.getElementById('sender').value;
                   var content = document.getElementById('content').value;
-                  var course_name = document.querySelector('input[name="course_name"]').value; // Use querySelector to get the value of hidden input
+                  var course_id = document.querySelector('input[name="course_id"]').value; // Use querySelector to get the value of hidden input
       
-                  socket.emit('new_message', { sender: sender, content: content, course_name: course_name });
+                  socket.emit('new_message', { sender: sender, content: content, course_id: course_id });
       
                   // Clear input fields after sending message
                   document.getElementById('content').value = '';

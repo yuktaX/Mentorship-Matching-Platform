@@ -143,6 +143,7 @@
           <br />
 
           <div class="row g-5">
+            {% for course_list in courses %}
             <div
               class="col-md-6 col-lg-4 wow bounceInUp"
               data-aos="zoom-in"
@@ -152,15 +153,16 @@
                 <div class="icon" style="background: rgb(209, 237, 255)">
                   <i class="bi bi-briefcase" style="color: #1985f0"></i>
                 </div>
-                {% for course_list in courses %}
-                <h3 class="title"><a href="/messages/{{course_list.course_name}}/{{username}}">{{ course_list.course_name }}</a></h3>
+                
+                <h3 class="title"><a href="{{url_for('messages')}}?course_id={{course_list['course_id']}}&username={{username}}">{{ course_list['course_name'] }}</a></h3>
                 <h5 style="font-size: small">Course starts on : {{course_list.course_start}}</h5>
                 <h5 style="font-size: small">Course ends on : {{course_list.course_end}}</h5>
                 <h5 style="font-size: small">Price: {{course_list.course_price}} INR</h5>
                 <p class="description">{{course_list.course_desc}}</p>
-                {% endfor %}
+                
               </div>
             </div>
+            {% endfor %}
             <!--<div
               class="col-md-6 col-lg-4 wow bounceInUp"
               data-aos="zoom-in"

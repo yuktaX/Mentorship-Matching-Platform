@@ -49,12 +49,12 @@
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
             <li>
-              <a class="nav-link scrollto active" href="{{ url_for('dashboard_mentor', mentor=mentor,username=username) }}"
-                >My Programs</a
+              <a class="nav-link scrollto active" href=""
+                >Home</a
               >
             </li>
-            <li><a href="{{ url_for('profile_mentor', username=username,msg='') }}">Profile</a></li>
-            <li><a href="{{ url_for('create_program', username=username) }}">Create Program</a></li>
+            <li><a href="{{ url_for('profile_mentor', username=mentor['username']) }}">Profile</a></li>
+            <li><a href="{{ url_for('create_program', username=mentor['username']) }}">Create Program</a></li>
             <li><a href="">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
@@ -127,9 +127,10 @@
                 <div class="icon" style="background: rgb(209, 237, 255)">
                   <i class="bi bi-journal-text" style="color: #1985f0"></i>
                 </div>
-                <h3 class="title"><a href="{{ url_for('view_course') }}?viewer=mentor&course_id={{course['course_id']}}&mentee_id=0">{{course.course_name}}</a></h3>
-                <h5 style="font-size: small">Course Status: {{course.course_status}}</h5>
-                <p class="description">{{course.course_desc}}</p>
+                <h3 class="title"><a href="{{ url_for('view_course') }}?viewer=mentor&course_id={{course['course_id']}}&mentee_id=0&isapproval=no">{{course.course_name}}</a></h3>
+                <h5 style="font-size: small; text-align: center;">Course Status: {{course.course_status}}</h5>
+                <p class="description" style="text-align:center;">{{course.course_desc}}</p>
+                <h4 class="title"><a href="{{ url_for('view_mentees') }}?course_id={{course['course_id']}}">View enrolled Mentees</a></h4>
                 <!-- <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
                     View Profile
                 </button> -->

@@ -86,13 +86,12 @@
       <div class="container d-flex align-items-center">
         <h1 class="logo me-auto"><a href="/">Mentify</a></h1>
         <br>
-        <h2 class="logo me-auto">Welcome {{mentee}}</a></h2>
+        <h2 class="logo me-auto">Welcome {{mentee['mentee_name']}}</a></h2>
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
-            <li><a class="nav-link scrollto active" href="{{ url_for('dashboard_mentee', username=username) }}">Home</a></li>
-            <li><a href="{{ url_for('logout')}}">Programs</a></li>
-            <li><a href="{{ url_for('profile_mentee', username=username,msg='') }}">Profile</a></li>
-            <li><a href="{{ url_for('logout')}}">My Courses</a></li>
+            <li><a class="nav-link scrollto active" href="{{ url_for('dashboard_mentee', username=mentee['username']) }}">Home</a></li>
+            <li><a href="{{ url_for('profile_mentee', username=mentee['username'],msg='') }}">Profile</a></li>
+            <li><a href="{{ url_for('my_courses', username=mentee['username'],msg='') }}">My Courses</a></li>
             <li><a href="{{ url_for('logout')}}">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
@@ -222,7 +221,7 @@
           </header>
 
           <div class="justify-content-center align-items-center">
-            <form method="POST" action="/search_sort_filter">
+            <form method="POST" action="{{url_for('search_sort_filter')}}?username={{mentee['username']}}">
               <label for="filter" class="border-transparent"></label>
 
               <select name="filter" id="filter-form">
@@ -269,7 +268,7 @@
                     <div class="icon" style="background: rgb(209, 237, 255)">
                         <!-- Add appropriate icon or image for the course -->
                     </div>
-                    <h3 class="title"><a href="">{{ course.course_name }}</a></h3>
+                    <h3 class="title"><a href="{{ url_for('view_course') }}?viewer=mentee&course_id={{course['course_id']}}&mentee_id={{mentee['mentee_id']}}&isapproval=no">{{ course.course_name }}</a></h3>
                     <h5 style="font-size: small">Course starts: {{ course.course_start }}</h5>
                     <h5 style="font-size: small">Price: {{ course.course_price }} INR</h5>
                     <p class="description">{{ course.course_desc }}</p>

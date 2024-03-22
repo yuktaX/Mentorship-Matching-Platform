@@ -48,7 +48,7 @@ def send_email(sender,receiver,subject,message):
     server = smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
 
-    server.login(sender,"xxxxxxxxxxxx")               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
+    server.login(sender,"nfvtzjsakvossicj")               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
     server.sendmail(sender,receiver,text)
     print("Email has been sent to : ", receiver)
 
@@ -87,6 +87,9 @@ def process_login():
                 if user['pass_word'] == request.form.get("password"):
                     session['loggedin']=True
                     return redirect(url_for("dashboard_mentor",username=username))
+                else:
+                    msg="incorrect username or password"
+                    return render_template("login.html",msg=msg)
             else:
                 msg="incorrect username or password"
                 return render_template("login.html",msg=msg)
@@ -103,9 +106,10 @@ def dashboard_mentee(username):
     cursor.execute(
             'SELECT * FROM mentee WHERE username = % s ', (username,) )
     mentee=cursor.fetchone()
-    print(mentee)
-    mentee_name=mentee['mentee_name']
-    return render_template("dashboard_mentee.html",mentee=mentee_name,username=mentee['username'])
+    
+    cursor.execute('SELECT * FROM tag')  
+    tags = cursor.fetchall()
+    return render_template("dashboard_mentee.html",mentee=mentee,tags=tags,selected_filter = 'none')
 
 @app.route('/dashboard_mentor/<username>')
 def dashboard_mentor(username):
@@ -116,7 +120,8 @@ def dashboard_mentor(username):
     cursor.execute(
             'SELECT * FROM course WHERE mentor_id = % s ', (mentor['mentor_id'],) )
     courses=cursor.fetchall()
-    return render_template("dashboard_mentor.html",mentor=mentor,username=mentor['username'],courses=courses)
+
+    return render_template("dashboard_mentor.html",mentor=mentor,courses=courses)
 
 
 
@@ -236,24 +241,49 @@ def profile_mentor(username):
         new_interest=request.form['interests']
         new_file=request.files['file']
         if new_file:
-                file_path = os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username),mentor['file_name'])
-                if os.path.exists(file_path):
-                    os.unlink(file_path)
-                filename = secure_filename(new_file.filename)
-                print("Filename : ",filename )
-                os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], username), exist_ok=True)
-                new_file.save(os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username), filename))
-        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('UPDATE mentor SET mentor_name = %s,contact_no=%s,email_id=%s,institute=%s,degree=%s,major=%s,work_exp=%s,interests=%s,file_name = %s WHERE username = %s',(new_name,new_contact,new_email,new_institute,new_degree,new_major,new_workexp,new_interest,filename,username))
-        mysql.connection.commit()
-        return render_template('profile_mentor.html',name=new_name,username=username,contact_no=new_contact,email_id=new_email,education=new_institute,degree=new_degree,major=new_major,work_exp=new_workexp,interests=new_interest,msg='Profile details updated successfully',view_profile=False,give_approval=False)
+            # file_path = os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username),mentor['file_name'])
+            # if os.path.exists(file_path):
+            #         os.unlink(file_path)
+            filename = secure_filename(new_file.filename)
+            print("Filename : ",filename )
+            os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], username), exist_ok=True)
+            new_file.save(os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username), filename))
+            cursor.execute('UPDATE mentor SET mentor_name = %s,contact_no=%s,email_id=%s,institute=%s,degree=%s,major=%s,work_exp=%s,interests=%s,file_name = %s WHERE username = %s',(new_name,new_contact,new_email,new_institute,new_degree,new_major,new_workexp,new_interest,filename,username))
+            mysql.connection.commit()
+            cursor.execute('SELECT * FROM mentor WHERE mentor_id=%s',(mentor['mentor_id'],))
+            mentor_new=cursor.fetchone()
+            return render_template('profile_mentor.html',mentor=mentor_new,msg='Profile details updated successfully',view_profile=False,give_approval=False)
+        elif not new_file:
+            cursor.execute('UPDATE mentor SET mentor_name = %s,contact_no=%s,email_id=%s,institute=%s,degree=%s,major=%s,work_exp=%s,interests=%s WHERE username = %s',(new_name,new_contact,new_email,new_institute,new_degree,new_major,new_workexp,new_interest,username,))
+            mysql.connection.commit()
+            cursor.execute('SELECT * FROM mentor WHERE mentor_id=%s',(mentor['mentor_id'],))
+            mentor_new=cursor.fetchone()
+            return render_template('profile_mentor.html',mentor=mentor_new,msg='Profile details updated successfully',view_profile=False,give_approval=False)
 
-    return render_template('profile_mentor.html',name=mentor['mentor_name'],username=mentor['username'],contact_no=mentor['contact_no'],email_id=mentor['email_id'],education=mentor['institute'],degree=mentor['degree'],major=mentor['major'],work_exp=mentor['work_exp'],interests=mentor['interests'],msg='',view_profile=False,give_approval=False)
+
+    return render_template('profile_mentor.html',mentor=mentor,msg='',view_profile=False,give_approval=False)
 
 @app.route('/view_file/<username>/<filename>')
 def view_file(username, filename):
     file_path=os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username), filename)
     return send_file(file_path, as_attachment=True)
+
+@app.route('/view_mentees')
+def view_mentees():
+    course_id = int(request.args.get('course_id'))
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM course_mentee WHERE course_id = %s',(course_id,))
+    course_mentees=cursor.fetchall()
+    mentees=[]
+    for each_mentee in course_mentees:
+        cursor.execute('SELECT * FROM mentee WHERE mentee_id=%s',(each_mentee['mentee_id'],))
+        mentee=cursor.fetchone()
+        mentees.append(mentee)
+    
+    cursor.execute('SELECT * FROM course WHERE course_id=%s',(course_id,))
+    course=cursor.fetchone()
+    return render_template('view_mentees.html',mentees=mentees,course=course)
+
 
 @app.route('/view_mentor_profile',methods=['GET','POST'])
 def view_mentor_profile():
@@ -264,6 +294,9 @@ def view_mentor_profile():
     cursor.execute(
             'SELECT * FROM mentor WHERE username = % s ', (username,) )
     mentor=cursor.fetchone()
+
+    if mentor['mentor_status']=='verified':
+        return render_template('profile_mentor.html',mentor=mentor,msg='',view_profile=True,give_approval=False,viewer=viewer)
     
     if request.method=='POST':
         if 'accept' in request.form:
@@ -277,22 +310,23 @@ def view_mentor_profile():
             mysql.connection.commit()
             send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Application status for Mentorship","Greetings from Mentify! Your profile has been inspected by Mentify. We regret to inform you that we could not ascertain your application. Please log into our website to update your profile details so that we may inspect it again. ")
         return redirect(url_for('admin'))
-    return render_template('profile_mentor.html',mentor=mentor,name=mentor['mentor_name'],username=mentor['username'],contact_no=mentor['contact_no'],email_id=mentor['email_id'],degree=mentor['degree'],education=mentor['institute'],major=mentor['major'],work_exp=mentor['work_exp'],interests=mentor['interests'],msg='',view_profile=True,give_approval=True,filename=mentor['file_name'],viewer=viewer)
+    
+    return render_template('profile_mentor.html',mentor=mentor,msg='',view_profile=True,give_approval=True,viewer=viewer)
     
 @app.route('/create_program/<username>',methods=['GET','POST'])
 def create_program(username):
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM tag')
     tags=cursor.fetchall()
-    cursor.execute('SELECT mentor_id FROM mentor WHERE username=%s',(username,))
-    mentor_id=cursor.fetchone()
+    cursor.execute('SELECT * FROM mentor WHERE username=%s',(username,))
+    mentor=cursor.fetchone()
     
     if request.method=='POST':
         course_name=request.form['course_name']
         start_date=request.form['start_date']
         end_date=request.form['end_date']
         price=request.form['price']
-        mentor_id=mentor_id['mentor_id']
+        mentor_id=mentor['mentor_id']
         course_desc=request.form['desc']
         max_mentee=request.form['max_mentee']
         print(mentor_id)
@@ -309,8 +343,8 @@ def create_program(username):
             if tag_name in request.form:
                 cursor.execute('INSERT INTO course_tag_relation(course_id,tag_id) VALUES(%s,%s)',(course_id,tag_id))
         mysql.connection.commit()
-        return render_template('create_program_mentor.html',username=username,tags=tags,msg='Course proposal successfully submitted. On approval by Mentify, you will receive an email confirming acceptance of your proposal and mentees will be able to join your program ')
-    return render_template('create_program_mentor.html',username=username,tags=tags,msg='')
+        return render_template('create_program_mentor.html',mentor=mentor,tags=tags,msg='Course proposal successfully submitted. On approval by Mentify, you will receive an email confirming acceptance of your proposal and mentees will be able to join your program ')
+    return render_template('create_program_mentor.html',mentor=mentor,tags=tags,msg='')
 
 
         
@@ -379,7 +413,7 @@ def admin():
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM mentor WHERE mentor_status = %s', ('unverified',))
     unapproved_mentors=cursor.fetchall()
-    cursor.execute('SELECT * FROM course WHERE course_status = %s', ('unverified',))
+    cursor.execute('SELECT course.* FROM course JOIN mentor ON course.mentor_id = mentor.mentor_id WHERE course.course_status = %s AND mentor.mentor_status = %s',('unverified','verified'))
     unapproved_courses=cursor.fetchall()
     cursor.execute("SELECT * FROM mentee_complaints WHERE complaint_status='pending'")
     mentee_pending_complaints = cursor.fetchall()
@@ -404,8 +438,12 @@ def view_course():
     viewer = request.args.get('viewer')
     course_id = int(request.args.get('course_id'))
     mentee_id=int(request.args.get('mentee_id'))
+    is_approval=request.args.get('isapproval')
+    mentee=[]
 
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM course_mentee WHERE course_id=%s',(course_id,))
+    course_mentee=cursor.fetchall()
     cursor.execute('SELECT * FROM course WHERE course_id = %s', (course_id,))
     course=cursor.fetchone()
     cursor.execute('SELECT * FROM mentor WHERE mentor_id = %s', (course['mentor_id'],))
@@ -418,19 +456,22 @@ def view_course():
         tag_new=cursor.fetchone()
         tags.append(tag_new)
     if viewer=='admin':
-        return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0)
+        return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0,course_mentee=course_mentee,is_approval=is_approval,mentee=mentee)
     elif viewer=='mentee':
         if not mentee_id==0:
-            return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=mentee_id)
+            cursor.execute('SELECT * FROM mentee WHERE mentee_id=%s',(mentee_id,))
+            mentee=cursor.fetchone()
+            return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=mentee_id,course_mentee=course_mentee,is_approval=is_approval,mentee=mentee)
     elif viewer=='mentor':
-        return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0)
+        return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0,course_mentee=course_mentee,is_approval=is_approval,mentee=mentee)
 
-    return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0)
+    return render_template('view_course.html',course=course,viewer=viewer,mentor=mentor,tags=tags,mentee_id=0,course_mentee=course_mentee,is_approval=is_approval,mentee=mentee)
 
 
 @app.route('/process_viewer_request',methods=['GET','POST'])
 def process_viewer_request():
     course_id=int(request.args.get('course_id'))
+    mentee_id=int(request.args.get('mentee_id'))
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if request.method=='POST':
         if 'admin_comment' in request.form:
@@ -445,7 +486,7 @@ def process_viewer_request():
             return redirect(url_for('admin'))
         elif 'register' in request.form:
             amount=request.form['price']
-            return redirect(url_for('payment',+ f'?amount={amount}&course_id={course_id}'))
+            return redirect(('/payment'+ f'?amount={amount}&course_id={course_id}&mentee_id={mentee_id}'))
 
 @app.route('/payment',methods=['GET','POST'])
 def payment():
@@ -465,9 +506,23 @@ def payment():
         send_email("vaishnoviarun7060@gmail.com",mentee['email_id'],"Course registration successful",f"Dear {mentee['mentee_name']}, you have successfully registered for the course {course['course_name']} conducted by mentor {mentor['mentor_name']}.\n Login to your Mentify account to check out course details!")
         send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Course registration",f"Dear {mentor['mentor_name']}, Mentee {mentee['mentee_name']} has enrolled for your course {course['course_name']}. You may now mentor your mentee and help him/her achieve their goals!!Login to your mentify account!!")
         return redirect(url_for('dashboard_mentee',username=mentee['username']))
-    
 
-    return render_template('payment.html',amount=amount)             
+    return render_template('payment.html',amount=amount)       
+
+@app.route('/my_courses/<username>',methods=['GET','POST'])
+def my_courses(username):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM mentee WHERE username=%s',(username,))
+    mentee=cursor.fetchone()
+    cursor.execute('SELECT * FROM course_mentee WHERE mentee_id=%s',(mentee['mentee_id'],))
+    course_list=cursor.fetchall()
+    courses=[]
+    for course in course_list:
+        cursor.execute('SELECT * FROM course WHERE course_id=%s',(course['course_id'],))
+        course_details=cursor.fetchone()
+        courses.append(course_details)
+    return render_template('my_courses_mentee.html',username=username,courses=courses)
+
 
 @app.route('/submit_mentee_complaint/<int:mentee_id>', methods=['GET','POST'])
 def submit_mentee_complaint(mentee_id):
@@ -484,6 +539,68 @@ def submit_mentee_complaint(mentee_id):
         
     return render_template('raise_ticket.html',msg='')
 
+
+@app.route('/search_sort_filter', methods=['POST'])
+def search_sort_filter():
+    """Sorts, searches, and filters data based on the provided parameters."""
+    username = request.args.get('username')
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM mentee WHERE username=%s',(username,))
+    mentee=cursor.fetchone()
+    cursor.execute('SELECT * FROM tag')
+    tag = cursor.fetchall()
+    print("tag : ", tag )
+    parameters = []
+    sort_option = "(SELECT COUNT(*) FROM course_mentee WHERE course_mentee.course_id = course.course_id) DESC"
+    query = "SELECT course.*, mentor.mentor_name FROM course JOIN mentor ON course.mentor_id = mentor.mentor_id WHERE course.course_status='verified'"
+    sort_choice = request.form['sort']
+
+    if 'sort' in request.form:
+        if sort_choice == 'valuation':
+            sort_option = "(SELECT COUNT(*) FROM course_mentee WHERE course_mentee.course_id = course.course_id) DESC"
+        elif sort_choice == 'equity':
+            sort_option = "course_price ASC"
+        elif sort_choice == 'investment':
+            sort_option = "course_price DESC"
+
+    selected_tag = request.form['filter']
+    if 'filter' in request.form:
+        print("tag : ", selected_tag)
+        if selected_tag != 'none':
+            query += " JOIN course_tag_relation ON course.course_id = course_tag_relation.course_id"
+            query += " JOIN tag ON course_tag_relation.tag_id = tag.tag_id"
+            query += " WHERE tag.tag_name = %s"
+            parameters.append(selected_tag)
+    else:
+        query += " WHERE 1=1"  # Ensuring the WHERE clause is present even if no tag is selected
+
+    search_term = request.form.get('search_term')
+    search_type = request.form.get('search_type')
+
+    if search_term:
+        print("Search Term:", search_term)
+        print("Search Type:", search_type)
+
+        if search_type == 'mentor':
+            query += " AND mentor.mentor_name LIKE %s"
+        elif search_type == 'course':
+            query += " AND course.course_name LIKE %s"
+        parameters.append("%" + search_term + "%")
+
+    query += f" ORDER BY {sort_option}"
+
+    cursor.execute(query, parameters)
+
+    print("Final query:", query)
+    print("Parameters:", parameters)
+    print(selected_tag)
+    cursor.execute(query, parameters)
+    data = cursor.fetchall()
+    # if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    #     return jsonify(data=data,tag=tag)  # Return JSON response for AJAX request
+    # else:
+    return render_template('dashboard_mentee.html',mentee=mentee, data=data, tags=tag, selected_filter=selected_tag, sort_option=sort_choice, search_term=search_term, search_type=search_type)
+
 @app.route('/submit_mentor_complaint/<int:mentor_id>', methods=['GET','POST'])
 def submit_mentor_complaint(mentor_id):
     if request.method=='POST':
@@ -499,107 +616,32 @@ def submit_mentor_complaint(mentor_id):
         
     return render_template('raise_ticket.html',msg='')
 
-@app.route('/messages/<course_name>/<username>')
-def messages(course_name,username):
-        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute(
-            'SELECT * FROM messages where course_name = %s',(course_name,))
-        messages = cursor.fetchall()
-        return render_template('my_courses_page_mentee.html',course_name=course_name,username=username,messages=messages)
+@app.route('/messages')
+def messages():
+    course_id = int(request.args.get('course_id'))
+    username = (request.args.get('username'))    
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+            'SELECT * FROM course where course_id = %s',(course_id,))
+    course=cursor.fetchone()
+    cursor.execute(
+            'SELECT * FROM messages where course_id = %s',(course_id,))
+    messages = cursor.fetchall()
+    return render_template('my_courses_page_mentee.html',course=course,username=username,messages=messages)
  
 @socketio.on('new_message')
 def handle_new_message(data):
     sender = data['sender']
     content = data['content']
-    course_name = data['course_name']
+    course_id = int(data['course_id'])
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("INSERT INTO messages(sender, content, course_name) VALUES (%s, %s, %s)",
-                   (sender, content, course_name))
+    cursor.execute("INSERT INTO messages(sender, content, course_id) VALUES (%s, %s, %s)",
+                   (sender, content, course_id))
     mysql.connection.commit()
     emit('new_message', {'sender': sender, 'content': content})
 
-# @app.route('/')
-# def index():
-#   """Renders the main page with initial data."""
-#   connection = connect_to_database()
-#   if connection is None:
-#     return "Error connecting to database"
 
-#   cursor = connection.cursor()
-#   cursor.execute("SELECT * FROM your_table")  # Replace with your table name
-#   data = cursor.fetchall()
-#   connection.close()
-
-#   return render_template('index.html', data=data)
-
-# @app.route('/search', methods=['POST'])
-# def search():
-#    """Searches the database based on mentor or course name."""
-#     connection = connect_to_database()
-#     if connection is None:
-#         return "Error connecting to database"
-
-#     mentor_name = request.form['mentor_name']
-#     cursor = connection.cursor()
-#     # Join with mentor table to get mentor name
-#     cursor.execute("""
-#         SELECT course.*, mentor.mentor_name
-#         FROM course
-#         JOIN mentor ON course.mentor_id = mentor.mentor_id 
-#         WHERE mentor.mentor_name LIKE %s OR course.course_name LIKE %s
-#     """,("%" + search_term + "%", "%" + search_term + "%"))
-#     data = cursor.fetchall()
-#     connection.close()
-
-#     return render_template('index.html', data=data)
-
-# @app.route('/filter', methods=['POST'])
-# def filter():
-#     """Filters data based on selected tags."""
-#     connection = connect_to_database()
-#     if connection is None:
-#         return "Error connecting to database"
-
-#     selected_tags = request.form.getlist('tags')
-
-#     cursor = connection.cursor()
-
-#     # Build dynamic query with OR clause for filtering based on tags
-#     query = """
-#         SELECT * FROM course
-#         WHERE %s IN (tag1, tag2, tag3, tag4, tag5)
-#     """
-
-#     # Execute the query for each selected tag
-#     data = []
-#     for tag in selected_tags:
-#         cursor.execute(query, (tag,))
-#         data.extend(cursor.fetchall())
-
-#     if search_term:
-#         print("Search Term:", search_term)
-#         print("Search Type:", search_type)
-
-#         if search_type == 'mentor':
-#             query += " AND mentor.mentor_name LIKE %s"
-#         elif search_type == 'course':
-#             query += " AND course.course_name LIKE %s"
-#         parameters.append("%" + search_term + "%")
-
-#     query += f" ORDER BY {sort_option}"
-
-#     cursor.execute(query, parameters)
-
-#     print("Final query:", query)
-#     print("Parameters:", parameters)
-#     print(selected_tag)
-#     cursor.execute(query, parameters)
-#     data = cursor.fetchall()
-#     # if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-#     #     return jsonify(data=data,tag=tag)  # Return JSON response for AJAX request
-#     # else:
-#     return render_template('dashboard_mentee.html', data=data, tag=tag, selected_filter=selected_tag, sort_option=sort_choice, search_term=search_term, search_type=search_type)
 
 @app.route('/logout')
 def logout():

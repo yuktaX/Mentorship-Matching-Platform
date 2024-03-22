@@ -88,10 +88,10 @@
         <nav id="navbar" class="navbar order-last order-lg-0">
           <ul>
             <li>
-              <a class="nav-link scrollto" href="/">My Programs</a>
+              <a class="nav-link scrollto" href="{{ url_for('dashboard_mentor',username=mentor['username']) }}">Home</a>
             </li>
-            <li><a href="{{url_for('profile_mentor', username=username)}}">Profile</a></li>
-            <li><a href="{{url_for('create_program', username=username)}}">Create Program</a></li>
+            <li><a href="{{url_for('profile_mentor', username=mentor['username'])}}">Profile</a></li>
+            <li><a href="">Create Program</a></li>
             <li><a href="">Logout</a></li>
           </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>

@@ -41,8 +41,8 @@
             <nav id="navbar" class="navbar order-last order-lg-0">
                 <ul>
                     <li><a class="nav-link scrollto active"
-                            href="{{url_for('dashboard_mentor',mentor=mentor,username=username)}}">Home</a></li>
-                    <li><a href="{{ url_for('profile_mentor', username=username,msg='') }}">Profile</a></li>
+                            href="{{url_for('dashboard_mentor',username=mentor['username'])}}">Home</a></li>
+                    <li><a href="">Profile</a></li>
                     <li><a href="my_courses_mentee">My Courses</a></li>
                     <li><a href="/logout">Logout</a></li>
                 </ul>
@@ -59,8 +59,8 @@
                     <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img
                             class="rounded-circle mt-5" width="150px"
                             src="https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?size=338&ext=jpg&ga=GA1.1.1395880969.1710028800&semt=ais"><span
-                            class="font-weight-bold">{{name}}</span><span
-                            class="text-black-50">{{username}}</span><span> </span></div>
+                            class="font-weight-bold">{{mentor['mentor_name']}}</span><span
+                            class="text-black-50">{{mentor['username']}}</span><span> </span></div>
                 </div>
                 <div class="col-md-8 border-right">
                     <div class="p-3 py-5">
@@ -77,33 +77,33 @@
                         <form action="" method="post" enctype="multipart/form-data">
                             <div class="row mt-2">
                                 <div class="col-md-6"><label class="labels"><b>Name</label><input type="text"
-                                        class="form-control" placeholder="Full Name" value="{{name}}" {% if view_profile
+                                        class="form-control" placeholder="Full Name" value="{{mentor['mentor_name']}}" {% if view_profile
                                         %}readonly{% endif %} name="name"></div>
 
                             </div>
                             <div class="row mt-3">
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Phone
                                             Number</b></label><input type="text" class="form-control"
-                                        placeholder="Phone number" value="{{contact_no}}" {% if view_profile
+                                        placeholder="Phone number" value="{{mentor['contact_no']}}" {% if view_profile
                                         %}readonly{% endif %} name="contact_no"></div>
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Email
                                             ID</b></label><input type="text" class="form-control" placeholder="Email id"
-                                        value="{{email_id}}" {% if view_profile %}readonly{% endif %} name="email_id">
+                                        value="{{mentor['email_id']}}" {% if view_profile %}readonly{% endif %} name="email_id">
                                 </div>
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Last Degree
                                             Obtained</b></label><input type="text" class="form-control"
-                                        placeholder="Last Degree Obtained" value="{{degree}}" {% if view_profile
+                                        placeholder="Last Degree Obtained" value="{{mentor['degree']}}" {% if view_profile
                                         %}readonly{% endif %} name="degree"></div>
                                 <div class="col-md-6"><label class="labels"
                                         style="margin-top: 4%;"><b>Institution</b></label><input type="text"
-                                        class="form-control" placeholder="Institute" value="{{education}}" {% if
+                                        class="form-control" placeholder="Institute" value="{{mentor['education']}}" {% if
                                         view_profile %}readonly{% endif %} name="education"></div>
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Major
                                             in</b></label><input type="text" class="form-control" placeholder="major"
-                                        value="{{major}}" name="major" {% if view_profile %}readonly{% endif %}></div>
+                                        value="{{mentor['major']}}" name="major" {% if view_profile %}readonly{% endif %}></div>
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Work
                                             Experience</b></label><input type="text" class="form-control"
-                                        placeholder="Work experience" value="{{work_exp}}" name="work_exp"></div>
+                                        placeholder="Work experience" value="{{mentor['work_exp']}}" name="work_exp"></div>
                                 <!-- {% if not_approval %}
                     <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Approval status</b></label><input type="text" class="form-control" placeholder="Work experience" value="{{work_exp}}" name="work_exp"></div>
                     {% endif %}
@@ -111,11 +111,11 @@
                                 <div class="col-md-12"><label class="labels" style="margin-top: 4%;"><i>Your
                                             interests/Specialization</i></label><textarea type="text" name="interests"
                                         class="form-control"
-                                        placeholder="Kindly tell us about what guidance you would like to find through our platform">{{interests}}</textarea>
+                                        placeholder="Kindly tell us about what guidance you would like to find through our platform">{{mentor['interests']}}</textarea>
                                 </div> <br>
                                 {% if give_approval %}
                                 <h2>View Resume : </h2>
-                                <a href="{{ url_for('view_file', username=username, filename=filename) }}"
+                                <a href="{{ url_for('view_file', username=mentor['username'], filename=mentor['file_name']) }}"
                                     target="_blank">View</a>
                                 {% endif %}
 
