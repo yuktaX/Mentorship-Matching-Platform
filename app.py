@@ -529,8 +529,8 @@ def my_courses(username):
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM mentee WHERE username=%s',(username,))
     mentee=cursor.fetchone()
-    cursor.execute('SELECT * FROM course_mentee WHERE mentee_id=%s',(mentee['mentee_id'],))
-    course_list=cursor.fetchall()
+    cursor.execute('SELECT * FROM course_mentee WHERE mentee_id=%s',(mentee['mentee_id'],)) #select the courses of a particular mentee from the course_mentee table in the schema
+    course_list=cursor.fetchall() #fetch all such courses
     courses=[]
     for course in course_list:
         cursor.execute('SELECT * FROM course WHERE course_id=%s',(course['course_id'],))
@@ -677,7 +677,7 @@ def messages():
     cursor.execute('SELECT * FROM mentor WHERE mentor_id=%s',(course['mentor_id'],))
     mentor=cursor.fetchone()
     cursor.execute(
-            'SELECT * FROM messages where course_id = %s',(course_id,))
+            'SELECT * FROM messages where course_id = %s',(course_id,)) #select all previous messages of the particular course
     messages = cursor.fetchall()
     # if viewer=='mentee':
     #     cursor.execute(
@@ -694,7 +694,7 @@ def messages():
     
     return render_template('my_courses_page_mentee.html',course=course,username=username,messages=messages,mentee=mentee,mentor=mentor,viewer=viewer)
  
-@socketio.on('new_message')
+@socketio.on('new_message') # socketio to handle real time chat
 def handle_new_message(data):
     sender = data['sender']
     content = data['content']
@@ -702,7 +702,7 @@ def handle_new_message(data):
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("INSERT INTO messages(sender, content, course_id) VALUES (%s, %s, %s)",
-                   (sender, content, course_id))
+                   (sender, content, course_id)) #insert into database (messages table)
     mysql.connection.commit()
     emit('new_message', {'sender': sender, 'content': content})
 
