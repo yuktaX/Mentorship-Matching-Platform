@@ -36,9 +36,9 @@
       <h1 class="logo me-auto"><a href="/">Mentify</a></h1>
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
-          <li><a href="">Home</a></li>
+          <li><a class="nav-link scrollto active" href="">Home</a></li>
           <li>
-            <a class="nav-link scrollto active" href="">Approvals & Tags</a>
+            <a href="">Approvals & Tags</a>
           </li>
           <!-- <li><a href="#services">Update Tags</a></li> -->
           <li><a href="">Logout</a></li>
@@ -56,15 +56,7 @@
           <h3>Mentors to be approved</h3>
         </header>
 
-        <div class="justify-content-center align-items-center">
-          <form method="" action="">
-            <input type="" value="" style="
-                  background-color: rgb(216, 237, 250);
-                  border-color: #000000;
-                  border-width: 1px;
-                " placeholder="Search.." />
-          </form>
-        </div>
+        
 
         <br />
 
@@ -75,7 +67,7 @@
               <div class="icon" style="background: rgb(209, 237, 255)">
                 <i class="bi bi-person-circle" style="color: #1985f0"></i>
               </div>
-              <h3 class="title"><a href="{{ url_for('view_mentor_profile') }}?viewer=admin&username={{mentor.username}}">{{mentor.mentor_name}}</a></h3>
+              <h3 class="title"><a href="{{ url_for('view_mentor_profile') }}?viewer=admin&username={{mentor.username}}&mentee_id=0">{{mentor.mentor_name}}</a></h3>
               <p class="description">{{mentor.interests}}</p>
               <!-- <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
                   View Profile
@@ -84,45 +76,7 @@
           </div>
           {% endfor %}
 
-          <!-- <div class="col-md-6 col-lg-4 wow bounceInUp" data-aos="zoom-in" data-aos-delay="100">
-            <div class="box">
-              <div class="icon" style="background: rgb(209, 237, 255)">
-                <i class="bi bi-person-circle" style="color: #1985f0"></i>
-              </div>
-              <h3 class="title"><a href="">Mentor Name</a></h3>
-              <p class="description">description/resume file</p>
-              <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
-                Approve
-              </button>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 wow bounceInUp" data-aos="zoom-in" data-aos-delay="100">
-            <div class="box">
-              <div class="icon" style="background: rgb(209, 237, 255)">
-                <i class="bi bi-person-circle" style="color: #1985f0"></i>
-              </div>
-              <h3 class="title"><a href="">Mentor Name</a></h3>
-              <p class="description">description/resume file</p>
-              <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
-                Approve
-              </button>
-            </div>
-          </div>
-
-
-          <div class="col-md-6 col-lg-4 wow bounceInUp" data-aos="zoom-in" data-aos-delay="100">
-            <div class="box">
-              <div class="icon" style="background: rgb(209, 237, 255)">
-                <i class="bi bi-person-circle" style="color: #1985f0"></i>
-              </div>
-              <h3 class="title"><a href="">Mentor Name</a></h3>
-              <p class="description">description/resume file</p>
-              <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
-                Approve
-              </button>
-            </div>
-          </div> -->
+          
           </div>
     </section>
     <br>
@@ -133,15 +87,7 @@
             <h3>Courses to be approved</h3>
           </header>
   
-          <div class="justify-content-center align-items-center">
-            <form method="" action="">
-              <input type="" value="" style="
-                    background-color: rgb(216, 237, 250);
-                    border-color: #000000;
-                    border-width: 1px;
-                  " placeholder="Search.." />
-            </form>
-          </div>
+         
   
           <br />
   
@@ -168,30 +114,52 @@
       <section id="services" class="services section-bg">
         <div class="container" data-aos="fade-up">
           <header class="section-header">
-            <h3>Complaints to be resolved</h3>
+            <h3>Mentee Complaints to be resolved</h3>
           </header>
   
-          <div class="justify-content-center align-items-center">
-            <form method="" action="">
-              <input type="" value="" style="
-                    background-color: rgb(216, 237, 250);
-                    border-color: #000000;
-                    border-width: 1px;
-                  " placeholder="Search.." />
-            </form>
-          </div>
+          
   
           <br />
   
           <div class="row g-5">
-            {% for course in courses %}
+            {% for complaint in mentee_complaints %}
             <div class="col-md-6 col-lg-4 wow bounceInUp" data-aos="zoom-in" data-aos-delay="100">
               <div class="box">
                 <div class="icon" style="background: rgb(209, 237, 255)">
                   <i class="bi bi-journal-text" style="color: #1985f0"></i>
                 </div>
-                <h3 class="title"><a href="{{ url_for('view_course') }}?viewer=admin&course_id={{course['course_id']}}&mentee_id=0">{{course.course_name}}</a></h3>
-                <p class="description">{{course.course_desc}}</p>
+                <h3 class="title"><a href="{{ url_for('view_mentee_complaint') }}?&complaint_id={{complaint['complaint_id']}}">View Complaint</a></h3>
+                <p class="description">{{complaint.complaint_desc}}</p>
+                <!-- <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
+                    View Profile
+                </button> -->
+              </div>
+            </div>
+            {% endfor %}
+  
+           
+            </div>
+      </section>
+      <br>
+      <section id="services" class="services section-bg">
+        <div class="container" data-aos="fade-up">
+          <header class="section-header">
+            <h3>Mentor Complaints to be resolved</h3>
+          </header>
+  
+          
+  
+          <br />
+  
+          <div class="row g-5">
+            {% for complaint in mentor_complaints %}
+            <div class="col-md-6 col-lg-4 wow bounceInUp" data-aos="zoom-in" data-aos-delay="100">
+              <div class="box">
+                <div class="icon" style="background: rgb(209, 237, 255)">
+                  <i class="bi bi-journal-text" style="color: #1985f0"></i>
+                </div>
+                <h3 class="title"><a href="{{ url_for('view_mentor_complaint') }}?&complaint_id={{complaint['complaint_id']}}">View Complaint</a></h3>
+                <p class="description">{{complaint.complaint_desc}}</p>
                 <!-- <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
                     View Profile
                 </button> -->

@@ -87,7 +87,11 @@
 
           </li>
           <li>{%if viewer=='mentor'%}<a href="{{url_for('profile_mentor', username=mentor['username'])}}">Profile</a>{%elif viewer=='mentee'%}<a href="{{url_for('profile_mentee', username=mentee['username'])}}">Profile</a>{%endif%}</li>
-          <li><a href="{{url_for('create_program', username=mentor['username'])}}">Create Program</a></li>
+          <li>{%if viewer=='mentor'%}
+            <a href="{{url_for('create_program', username=mentor['username'])}}">Create Program</a>
+            {%elif viewer=='mentee'%}
+            <a href="{{ url_for('my_courses', username=mentee['username'],msg='') }}">My Courses</a>
+          {%endif%}</li>
           <li><a href="">Logout</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
@@ -118,7 +122,7 @@
                     <label class="labels"><b>Mentor Name</b></label>
                     <input type="text" class="form-control" placeholder="Full Name" value="{{ mentor.mentor_name }}"
                       readonly>
-                    <a href="{{ url_for('view_mentor_profile')}}?viewer={{viewer}}&username={{mentor['username']}}"
+                    <a href="{{ url_for('view_mentor_profile')}}?viewer={{viewer}}&username={{mentor['username']}}&mentee_id={{mentee_id}}"
                       class="btn btn-primary">View Profile</a>
                   </div>
 
@@ -178,11 +182,16 @@
                     readonly>{{course['admin_comment']}}</textarea></div> <br>
                     <div class="col-md-12"><label class="labels"><b>No of students Enrolled : </b></label><input type="number"
                       class="form-control" placeholder="Full Name" value="{{course_mentee|length}}" readonly></div>
-                {%elif viewer=='mentee'%}
+                      {% elif viewer == 'mentee' and course.max_limit > course_mentee|length %}
                 <div class="col-md-12"><label class="labels"><b>No of students Enrolled : </b></label><input type="number"
                   class="form-control" placeholder="Full Name" value="{{course_mentee|length}}" readonly></div>
                 <div class="mt-5 text-center"><button class="btn profile-button" type="submit" style="color: #ffffff;"
                     name="register">Register</button></div>
+                    {% elif viewer == 'mentee' and course.max_limit <= course_mentee|length %}
+                    <div class="col-md-12"><label class="labels"><b>No of students Enrolled : </b></label><input type="number"
+                      class="form-control" placeholder="Full Name" value="{{course_mentee|length}}" readonly></div>
+                    <h5>Enrollment in this course is full</h5>
+                    <a href="{{ url_for('dashboard_mentee', username=mentee['username']) }}" class="btn btn-primary">Browse other courses</a>
                 {%elif viewer=='mentor'%}
                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Course approval
                       status</b></label><input type="text" class="form-control" placeholder=""

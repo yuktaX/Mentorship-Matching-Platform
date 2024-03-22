@@ -36,12 +36,15 @@
       <h1 class="logo me-auto"><a href="/">Mentify</a></h1>
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
-          <li><a href="">Home</a></li>
+          <li><a class="nav-link scrollto active" href="{{url_for('dashboard_mentor',username=mentor['username'])}}">Home</a></li>
           <li>
-            <a class="nav-link scrollto active" href="">Approvals & Tags</a>
+            <a  href="{{url_for('dashboard_mentor',username=mentor['username'])}}">Profile</a>
+          </li>
+          <li>
+            <a  href="{{ url_for('create_program', username=mentor['username']) }}">Create Program</a>
           </li>
           <!-- <li><a href="#services">Update Tags</a></li> -->
-          <li><a href="">Logout</a></li>
+          <li><a href="/logout">Logout</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
@@ -56,15 +59,7 @@
           <h3>Mentees enrolled in the course</h3>
         </header>
 
-        <div class="justify-content-center align-items-center">
-          <form method="" action="">
-            <input type="" value="" style="
-                  background-color: rgb(216, 237, 250);
-                  border-color: #000000;
-                  border-width: 1px;
-                " placeholder="Search.." />
-          </form>
-        </div>
+    
 
         <br />
 
@@ -77,7 +72,7 @@
               </div>
               <h3 class="title"><a href="{{ url_for('profile_mentee', username=mentee['username']) }}">{{mentee['mentee_name']}}</a></h3>
               <p class="description" style="text-align: center;">{{mentee.interests}}</p>
-              <h4 class="title"><a href="{{url_for('messages')}}?course_id={{course['course_id']}}&username={{mentee['username']}}">Communicate with Mentee</a></h4>
+              <h4 class="title"><a href="{{url_for('messages')}}?course_id={{course['course_id']}}&username={{mentee['username']}}&viewer=mentor">Communicate with Mentee</a></h4>
               <!-- <button class="btn btn-primary btn-md btn-block" type="submit" style="background: #00304e">
                   View Profile
               </button> -->

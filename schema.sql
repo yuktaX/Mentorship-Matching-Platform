@@ -40,7 +40,7 @@ CREATE TABLE course (
     course_start DATE,
     course_end DATE,
     course_price INT,
-    course_status VARCHAR(20),
+    course_status ENUM('unverified', 'verified','rejected') DEFAULT 'unverified',
     admin_comment VARCHAR(500),
     course_desc VARCHAR(500),
     index(course_name),
@@ -74,23 +74,28 @@ CREATE TABLE mentee_tag(
 
 CREATE TABLE mentee_complaints(
     complaint_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    course_id INT,
     mentee_id INT,
     complaint_date DATE,
     complaint_desc VARCHAR(500),
     complaint_status ENUM('pending', 'resolved') DEFAULT 'pending',
     complaint_action VARCHAR(500),
-    FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id)
+    FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
+
 
 );
 
 CREATE TABLE mentor_complaints(
     complaint_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    mentor_id INT,
+    mentee_id INT,
+    course_id INT,
     complaint_date DATE,
     complaint_desc VARCHAR(500),
     complaint_status ENUM('pending', 'resolved') DEFAULT 'pending',
     complaint_action VARCHAR(500),
-    FOREIGN KEY (mentor_id) REFERENCES mentor(mentor_id)
+    FOREIGN KEY (mentee_id) REFERENCES mentee(mentee_id),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
 
 );
 CREATE TABLE course_mentee(
@@ -120,7 +125,9 @@ CREATE TABLE feedback (
 );
 
 
-
+INSERT INTO tag(tag_name) VALUES ('Product Management');
+INSERT INTO tag(tag_name) VALUES ('Soft Skills');
+INSERT INTO tag(tag_name) VALUES ('Network Security');
 INSERT INTO mentee(mentee_name,email_id,username,pass_word) VALUES ('Mimi','vaishnoviarun7060@gmail.com','mimi','abcd');
 INSERT INTO mentor(mentor_name,email_id,username,pass_word,degree,work_exp,mentor_status) VALUES ('Sneha','sneha@example.com','sneha','1234','BTech',4,"unverified");
 insert into course(mentor_id,course_name,course_start,course_end,course_price,course_desc) values(1,'data structures','2024-01-03','2024-03-29','500','A complete beginnner to advanced data structures course');

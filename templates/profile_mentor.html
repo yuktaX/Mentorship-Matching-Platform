@@ -40,10 +40,25 @@
             <h1 class="logo me-auto"><a href="/">Mentify</a></h1>
             <nav id="navbar" class="navbar order-last order-lg-0">
                 <ul>
-                    <li><a class="nav-link scrollto active"
-                            href="{{url_for('dashboard_mentor',username=mentor['username'])}}">Home</a></li>
-                    <li><a href="">Profile</a></li>
-                    <li><a href="my_courses_mentee">My Courses</a></li>
+
+                    <li>{%if viewer=='admin'%}
+                        <a class="nav-link scrollto active" href="{{url_for('admin')}}">Home</a>
+                        {%elif viewer=='mentor'%}<a 
+                            href="{{url_for('dashboard_mentor',username=mentor['username'])}}">Home</a>
+                        {%elif viewer=='mentee'%}
+                        <a class="nav-link scrollto active"
+                            href="{{url_for('dashboard_mentee',username=mentee['username'])}}">Home</a>
+                        {%endif%}
+                    </li>
+                    <li>{%if viewer=='mentor'%}<a class="nav-link scrollto active" href="">Profile</a>
+                        {%elif viewer=='mentee'%}
+                        <a href="{{url_for('dashboard_mentee',username=mentee['username'])}}">Profile</a>
+                        {%endif%}
+                    </li>
+                    <li>{%if viewer=='mentor'%}<a href="{{ url_for('create_program', username=mentor['username']) }}">Create Program</a>
+                        {%elif viewer=='mentee'%}
+                        <a href="{{ url_for('my_courses', username=mentee['username'],msg='') }}">My Course</a>
+                    {%endif%}</li>
                     <li><a href="/logout">Logout</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
@@ -77,8 +92,8 @@
                         <form action="" method="post" enctype="multipart/form-data">
                             <div class="row mt-2">
                                 <div class="col-md-6"><label class="labels"><b>Name</label><input type="text"
-                                        class="form-control" placeholder="Full Name" value="{{mentor['mentor_name']}}" {% if view_profile
-                                        %}readonly{% endif %} name="name"></div>
+                                        class="form-control" placeholder="Full Name" value="{{mentor['mentor_name']}}"
+                                        {% if view_profile %}readonly{% endif %} name="name"></div>
 
                             </div>
                             <div class="row mt-3">
@@ -88,22 +103,25 @@
                                         %}readonly{% endif %} name="contact_no"></div>
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Email
                                             ID</b></label><input type="text" class="form-control" placeholder="Email id"
-                                        value="{{mentor['email_id']}}" {% if view_profile %}readonly{% endif %} name="email_id">
+                                        value="{{mentor['email_id']}}" {% if view_profile %}readonly{% endif %}
+                                        name="email_id">
                                 </div>
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Last Degree
                                             Obtained</b></label><input type="text" class="form-control"
-                                        placeholder="Last Degree Obtained" value="{{mentor['degree']}}" {% if view_profile
-                                        %}readonly{% endif %} name="degree"></div>
+                                        placeholder="Last Degree Obtained" value="{{mentor['degree']}}" {% if
+                                        view_profile %}readonly{% endif %} name="degree"></div>
                                 <div class="col-md-6"><label class="labels"
                                         style="margin-top: 4%;"><b>Institution</b></label><input type="text"
-                                        class="form-control" placeholder="Institute" value="{{mentor['education']}}" {% if
-                                        view_profile %}readonly{% endif %} name="education"></div>
+                                        class="form-control" placeholder="Institute" value="{{mentor['institute']}}" {%
+                                        if view_profile %}readonly{% endif %} name="education"></div>
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Major
                                             in</b></label><input type="text" class="form-control" placeholder="major"
-                                        value="{{mentor['major']}}" name="major" {% if view_profile %}readonly{% endif %}></div>
+                                        value="{{mentor['major']}}" name="major" {% if view_profile %}readonly{% endif
+                                        %}></div>
                                 <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Work
                                             Experience</b></label><input type="text" class="form-control"
-                                        placeholder="Work experience" value="{{mentor['work_exp']}}" name="work_exp"></div>
+                                        placeholder="Work experience" value="{{mentor['work_exp']}}" name="work_exp">
+                                </div>
                                 <!-- {% if not_approval %}
                     <div class="col-md-6"><label class="labels" style="margin-top: 4%;"><b>Approval status</b></label><input type="text" class="form-control" placeholder="Work experience" value="{{work_exp}}" name="work_exp"></div>
                     {% endif %}
