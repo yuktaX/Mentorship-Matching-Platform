@@ -15,6 +15,8 @@ app = Flask(__name__)
  
 app.secret_key = 'your secret key'
 
+mentify_email='your_email@example.com'
+
 
  
  
@@ -141,7 +143,7 @@ def signup_process():
             cursor.execute(
             'INSERT INTO mentee(mentee_name,contact_no,email_id,username,pass_word) VALUES(%s,%s, %s,%s, %s)', (name,contact_no,email_id,username,password) )
             mysql.connection.commit()
-            send_email("vaishnoviarun7060@gmail.com",email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentee on Mentify!")       #Replace mentify@example.com with your email_id
+            send_email(mentify_email,email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentee on Mentify!")       #Replace mentify@example.com with your email_id
             return render_template("login.html",msg="Signup Successful. You may login Now")
         else:
             print("registering mentor")
@@ -162,7 +164,7 @@ def signup_process():
             cursor.execute(
            'INSERT INTO mentor(mentor_name,contact_no,email_id,username,pass_word,file_name,mentor_status) VALUES(%s, %s, %s,%s, %s,%s,%s)', (name,contact_no,email_id,username,password,resume.filename,'unverified') )
             mysql.connection.commit()
-            send_email("vaishnoviarun7060@gmail.com",email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentor on Mentify! Kindly log into Mentify website and upload your resume. On approval by admin you will be able to create courses and enroll mentees. On aproval you will be sent a confirmation email")  #Replace mentify@example.com with your email_id
+            send_email(mentify_email,email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentor on Mentify! Kindly log into Mentify website and upload your resume. On approval by admin you will be able to create courses and enroll mentees. On aproval you will be sent a confirmation email")  #Replace mentify@example.com with your email_id
             return render_template("login.html",msg="Signup Successful. You may login Now")
 
 
@@ -316,12 +318,12 @@ def view_mentor_profile():
             cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('UPDATE mentor SET mentor_status = %s WHERE username = %s' ,('verified',username) )
             mysql.connection.commit()
-            send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Approval for Mentorship","Greetings from Mentify! Your profile has been verified by Mentify. Now you can log into our website and create courses, hold mentorship sessions and much more! Welcome onboard!")
+            send_email(mentify_email,mentor['email_id'],"Approval for Mentorship","Greetings from Mentify! Your profile has been verified by Mentify. Now you can log into our website and create courses, hold mentorship sessions and much more! Welcome onboard!")
         elif 'reject' in request.form:
             cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('UPDATE mentor SET mentor_status = %s WHERE username = %s' ,('rejected',username) )
             mysql.connection.commit()
-            send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Application status for Mentorship","Greetings from Mentify! Your profile has been inspected by Mentify. We regret to inform you that we could not ascertain your application. Please log into our website to update your profile details so that we may inspect it again. ")
+            send_email(mentify_email,mentor['email_id'],"Application status for Mentorship","Greetings from Mentify! Your profile has been inspected by Mentify. We regret to inform you that we could not ascertain your application. Please log into our website to update your profile details so that we may inspect it again. ")
         return redirect(url_for('admin'))
     
     return render_template('profile_mentor.html',mentor=mentor,msg='',view_profile=True,give_approval=True,viewer=viewer)
@@ -379,7 +381,7 @@ def forgot_password():
                 if(email_fp==user['email_id']):
                     otp = str(random.randint(100000, 999999))
                     otp_gen=otp
-                    send_email("vaishnoviarun7060@gmail.com",email_fp,"OTP For Changing Password",f"Hi {user['mentee_name']}!\nOTP for changing password is {otp}. Do not share the OTP with anyone.\nIf you did not apply for changing password kindly report it on Mentify website.")
+                    send_email(mentify_email,email_fp,"OTP For Changing Password",f"Hi {user['mentee_name']}!\nOTP for changing password is {otp}. Do not share the OTP with anyone.\nIf you did not apply for changing password kindly report it on Mentify website.")
                     return render_template('forgot_password.html', username=username, show_otp_form=True,msg='')
                 else:
                     return render_template('forgot_password.html', username=username, show_otp_form=False,msg='Incorrect Email Id entered')
@@ -393,7 +395,7 @@ def forgot_password():
                     if(email_fp==user['email_id']):
                         otp = str(random.randint(100000, 999999))
                         otp_gen=otp
-                        send_email("vaishnoviarun7060@gmail.com",email_fp,"OTP For Changing Password",f"Hi {user['mentor_name']}!\nOTP for changing password is {otp}. Do not share the OTP with anyone.\nIf you did not apply for changing password kindly report it on Mentify website.")
+                        send_email(mentify_email,email_fp,"OTP For Changing Password",f"Hi {user['mentor_name']}!\nOTP for changing password is {otp}. Do not share the OTP with anyone.\nIf you did not apply for changing password kindly report it on Mentify website.")
                         return render_template('forgot_password.html', username=username, show_otp_form=True,msg='')
                     else:
                         return render_template('forgot_password.html', username=username, show_otp_form=False,msg='Incorrect Email Id entered')                   
@@ -406,7 +408,7 @@ def forgot_password():
             new_password = request.form['new_password']
             print(f"Otp gen : {otp_gen}, otp_entered : {otp_entered}")
             if(otp_entered==otp_gen):
-                send_email("vaishnoviarun7060@gmail.com",email_fp,"Password Changed","Greetings from Mentify! Password of your mentify account has been successfully changed! If you did not initiate the password change, kindly contact mentify support team.")
+                send_email(mentify_email,email_fp,"Password Changed","Greetings from Mentify! Password of your mentify account has been successfully changed! If you did not initiate the password change, kindly contact mentify support team.")
                 cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
                 if(usertype_fp=='mentee'):
                     cursor.execute('UPDATE mentee SET pass_word = %s WHERE username = %s AND email_id = %s',(new_password,username,email_fp))
@@ -516,8 +518,8 @@ def payment():
         course=cursor.fetchone()
         cursor.execute('SELECT * FROM mentor WHERE mentor_id=%s',(course['mentor_id'],))
         mentor=cursor.fetchone()
-        send_email("vaishnoviarun7060@gmail.com",mentee['email_id'],"Course registration successful",f"Dear {mentee['mentee_name']}, you have successfully registered for the course {course['course_name']} conducted by mentor {mentor['mentor_name']}.\n Login to your Mentify account to check out course details!")
-        send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Course registration",f"Dear {mentor['mentor_name']}, Mentee {mentee['mentee_name']} has enrolled for your course {course['course_name']}. You may now mentor your mentee and help him/her achieve their goals!!Login to your mentify account!!")
+        send_email(mentify_email,mentee['email_id'],"Course registration successful",f"Dear {mentee['mentee_name']}, you have successfully registered for the course {course['course_name']} conducted by mentor {mentor['mentor_name']}.\n Login to your Mentify account to check out course details!")
+        send_email(mentify_email,mentor['email_id'],"Course registration",f"Dear {mentor['mentor_name']}, Mentee {mentee['mentee_name']} has enrolled for your course {course['course_name']}. You may now mentor your mentee and help him/her achieve their goals!!Login to your mentify account!!")
         return redirect(url_for('dashboard_mentee',username=mentee['username']))
 
     return render_template('payment.html',amount=amount)       
@@ -547,7 +549,7 @@ def submit_mentee_complaint(mentee_id):
         mysql.connection.commit()
         cursor.execute("SELECT * FROM mentee WHERE mentee_id=%s",(mentee_id,))
         mentee=cursor.fetchone()
-        send_email("vaishnoviarun7060@gmail.com",mentee['email_id'],"Complaint registered successfully",f"Dear {mentee['mentee_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
+        send_email(mentify_email,mentee['email_id'],"Complaint registered successfully",f"Dear {mentee['mentee_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
         return render_template('raise_ticket.html',msg='Complaint successfully submitted')
         
     return render_template('raise_ticket.html',msg='')
@@ -633,7 +635,7 @@ def complaint_against_mentor():
         mentee=cursor.fetchone()
         cursor.execute("INSERT INTO mentee_complaints (course_id,mentee_id, complaint_date, complaint_desc) VALUES (%s,%s, %s, %s)", (course['course_id'],mentee['mentee_id'], complaint_date, complaint_desc))
         mysql.connection.commit()
-        send_email("vaishnoviarun7060@gmail.com",mentee['email_id'],"Complaint registered successfully",f"Dear {mentee['mentee_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
+        send_email(mentify_email,mentee['email_id'],"Complaint registered successfully",f"Dear {mentee['mentee_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
         return render_template('raise_ticket.html',msg='Complaint successfully submitted')
         
     return render_template('raise_ticket.html',msg='')
@@ -655,7 +657,7 @@ def complaint_against_mentee():
         cursor.execute("INSERT INTO mentor_complaints (course_id,mentee_id, complaint_date, complaint_desc) VALUES (%s, %s, %s,%s)", (course_id,mentee['mentee_id'], complaint_date, complaint_desc))
         mysql.connection.commit()
        
-        send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Complaint registered successfully",f"Dear {mentor['mentor_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
+        send_email(mentify_email,mentor['email_id'],"Complaint registered successfully",f"Dear {mentor['mentor_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
         return render_template('raise_ticket.html',msg='Complaint successfully submitted')
         
     return render_template('raise_ticket.html',msg='')
@@ -719,7 +721,7 @@ def view_mentee_complaint():
         cursor.execute("UPDATE mentee_complaints SET complaint_action = %s,complaint_status=%s WHERE complaint_id=%s", (complaint_action,'resolved',complaint_id))
         mysql.connection.commit()
        
-        send_email("vaishnoviarun7060@gmail.com",mentee['email_id'],"Complaint resolved successfully",f"Dear {mentee['mentee_name']},your complaint has been resolved. Action taken : {complaint_action}\nLogin to our website to continue learning!!.")
+        send_email(mentify_email,mentee['email_id'],"Complaint resolved successfully",f"Dear {mentee['mentee_name']},your complaint has been resolved. Action taken : {complaint_action}\nLogin to our website to continue learning!!.")
         return redirect(url_for('admin'))
         
     return render_template('resolve_ticket.html',complaint=complaint,msg='')
@@ -745,7 +747,7 @@ def view_mentor_complaint():
         cursor.execute("UPDATE mentor_complaints SET complaint_action = %s,complaint_status=%s WHERE complaint_id=%s", (complaint_action,'resolved',complaint_id))
         mysql.connection.commit()
        
-        send_email("vaishnoviarun7060@gmail.com",mentor['email_id'],"Complaint resolved successfully",f"Dear {mentor['mentor_name']},your complaint has been resolved. Action taken : {complaint_action}\nLogin to our website to continue learning!!.")
+        send_email(mentify_email,mentor['email_id'],"Complaint resolved successfully",f"Dear {mentor['mentor_name']},your complaint has been resolved. Action taken : {complaint_action}\nLogin to our website to continue learning!!.")
         return redirect(url_for('admin'))
         
     return render_template('resolve_ticket.html',complaint=complaint,msg='')
