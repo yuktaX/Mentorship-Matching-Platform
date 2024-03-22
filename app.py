@@ -594,7 +594,7 @@ def submit_feedback():
     return render_template('feedback_form.html')
 
 @app.route('/courses/<int:course_id>')
-def view_course(course_id):
+def rating(course_id):
     # Query feedback data to calculate average rating for the course
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT AVG(rating) FROM feedback WHERE course_id = %s", (course_id,))
