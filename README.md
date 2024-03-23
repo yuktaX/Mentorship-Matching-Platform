@@ -1,4 +1,6 @@
-# To run the application
+# Mentorship Matching Platform - By Junihers Study Group 10
+
+## To run the application
 
 ### Create a virtual environment
 
