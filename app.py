@@ -622,25 +622,6 @@ def my_courses(username):
     return render_template('my_courses_mentee.html',username=username,courses=courses)
 
 
-@app.route('/submit_mentee_complaint/<int:mentee_id>', methods=['GET','POST'])
-def submit_mentee_complaint(mentee_id):
-
- '''This route allows mentees to submit complaints.'''
-
-    if request.method=='POST':
-        complaint_date = datetime.now()
-        complaint_desc = request.form['complaint_desc']    
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("INSERT INTO mentee_complaints (mentee_id, complaint_date, complaint_desc) VALUES (%s, %s, %s)", (mentee_id, complaint_date, complaint_desc))
-        mysql.connection.commit()
-        cursor.execute("SELECT * FROM mentee WHERE mentee_id=%s",(mentee_id,))
-        mentee=cursor.fetchone()
-        send_email(mentify_email,mentee['email_id'],"Complaint registered successfully",f"Dear {mentee['mentee_name']},your complaint has been registered successfully.\nYou may check the status of the complaint on our website.")
-        return render_template('raise_ticket.html',msg='Complaint successfully submitted')
-        
-    return render_template('raise_ticket.html',msg='')
-
-
 @app.route('/search_sort_filter', methods=['POST'])
 def search_sort_filter():
 
@@ -714,6 +695,9 @@ mentor/course name.'''
 
 @app.route('/complaint_against_mentor', methods=['GET','POST'])
 def complaint_against_mentor():
+
+ '''This route allows mentees to submit complaints.'''
+ 
     mentee_id = int(request.args.get('mentee_id'))
     course_id = int(request.args.get('course_id'))
     if request.method=='POST':
@@ -733,6 +717,9 @@ def complaint_against_mentor():
 
 @app.route('/complaint_against_mentee', methods=['GET','POST'])
 def complaint_against_mentee():
+
+ '''This route allows mentors to submit complaints.'''
+ 
     mentee_id = int(request.args.get('mentee_id'))
     course_id = int(request.args.get('course_id'))
     if request.method=='POST':
