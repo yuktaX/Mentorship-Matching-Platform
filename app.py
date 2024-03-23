@@ -55,7 +55,6 @@ receiver's email address, email subject, and message content as input parameters
 
     server.login(sender,"cfocwnhodvewgutn")               # dummy passcode. Sender should be your email id. passcode is app password. Explained in detail in readme file
     server.sendmail(sender,receiver,text)
-    print("Email has been sent to : ", receiver)
 
 
 @app.route('/')
@@ -157,9 +156,7 @@ the user's provided email address.'''
     
     msg=''
     if request.method=='POST':
-        print(user_type)
         if user_type=="mentee": 
-            print("registering mentee")
             name = request.form['name']
             contact_no = request.form['contact_no']
             email_id = request.form['email']
@@ -172,7 +169,6 @@ the user's provided email address.'''
             send_email(mentify_email,email_id,"Thanks for joining Mentify","Welcome to Mentify! You have successfully signed up as a mentee on Mentify!")       #Replace mentify@example.com with your email_id
             return render_template("login.html",msg="Signup Successful. You may login Now")
         else:
-            print("registering mentor")
             name = request.form['name']
             contact_no = request.form['contact_no']
             email_id = request.form['email']
@@ -181,7 +177,6 @@ the user's provided email address.'''
             resume=request.files['file']
             if resume:
                 filename = secure_filename(resume.filename)
-                print("Filename : ",filename )
                 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], username), exist_ok=True)
                 resume.save(os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username), filename))
                 
@@ -202,7 +197,6 @@ selection, it renders the signup form based on the selected category.'''
  
     global user_type
     user_type=request.form['button']
-    print("User type : ", user_type)
     if(user_type=='mentee'):   
         return render_template("signup_mentee.html")
     elif(user_type=='mentor'):
@@ -224,11 +218,8 @@ database accordingly, and renders the updated profile page.'''
     all_tags=cursor.fetchall()
     cursor.execute('SELECT * FROM mentee_tag WHERE mentee_id=%s',(mentee['mentee_id'],))
     mentee_tags=cursor.fetchall()
-    print("Mentee tags : ",mentee_tags)
     is_checked={}
     for tag in mentee_tags:
-        print('tag : ',tag)
-        print(f"tag_id : {tag['tag_id']}")
         cursor.execute('SELECT * FROM tag WHERE tag_id = %s',(tag['tag_id'],))
         tag_val=cursor.fetchone()
         tag_name=tag_val['tag_name']
@@ -288,7 +279,6 @@ accordingly, and renders the updated profile page.'''
             # if os.path.exists(file_path):
             #         os.unlink(file_path)
             filename = secure_filename(new_file.filename)
-            print("Filename : ",filename )
             os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], username), exist_ok=True)
             new_file.save(os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username), filename))
             cursor.execute('UPDATE mentor SET mentor_name = %s,contact_no=%s,email_id=%s,institute=%s,degree=%s,major=%s,work_exp=%s,interests=%s,file_name = %s WHERE username = %s',(new_name,new_contact,new_email,new_institute,new_degree,new_major,new_workexp,new_interest,filename,username))
@@ -402,13 +392,11 @@ program/course.'''
         mentor_id=mentor['mentor_id']
         course_desc=request.form['desc']
         max_mentee=request.form['max_mentee']
-        print(mentor_id)
         cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('INSERT INTO course(mentor_id, course_name, course_start, course_end, course_price,course_desc,max_limit) VALUES (%s, %s, %s, %s, %s,%s,%s)', (mentor_id, course_name, start_date, end_date, price,course_desc,max_mentee))
         mysql.connection.commit()
         cursor.execute('SELECT * FROM course WHERE course_name = %s',(course_name,))
         course=cursor.fetchone()
-        print(course)
         course_id=course['course_id']
         for tag in tags:
             tag_name=tag['tag_name']
@@ -470,7 +458,6 @@ correct.'''
             username = request.form['username']
             otp_entered = request.form['otp']
             new_password = request.form['new_password']
-            print(f"Otp gen : {otp_gen}, otp_entered : {otp_entered}")
             if(otp_entered==otp_gen):
                 send_email(mentify_email,email_fp,"Password Changed","Greetings from Mentify! Password of your mentify account has been successfully changed! If you did not initiate the password change, kindly contact mentify support team.")
                 cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -569,7 +556,6 @@ def process_viewer_request():
     if request.method=='POST':
         if 'admin_comment' in request.form:
             admin_comment=request.form['admin_comment']
-            print(admin_comment)
             if 'accept' in request.form:
                 cursor.execute('UPDATE course SET admin_comment= %s,course_status=%s WHERE course_id=%s',(admin_comment,'verified',course_id))
                 mysql.connection.commit()
@@ -639,7 +625,6 @@ mentor/course name.'''
     mentee=cursor.fetchone()
     cursor.execute('SELECT * FROM tag')
     tag = cursor.fetchall()
-    print("tag : ", tag )
     parameters = []
     sort_option = "(SELECT COUNT(*) FROM course_mentee WHERE course_mentee.course_id = course.course_id) DESC"
     query = "SELECT course.*, mentor.mentor_name FROM course JOIN mentor ON course.mentor_id = mentor.mentor_id"
@@ -655,7 +640,6 @@ mentor/course name.'''
 
     selected_tag = request.form['filter']
     if 'filter' in request.form:
-        print("tag : ", selected_tag)
         if selected_tag != 'none':
             query += " JOIN course_tag_relation ON course.course_id = course_tag_relation.course_id"
             query += " JOIN tag ON course_tag_relation.tag_id = tag.tag_id"
@@ -671,8 +655,6 @@ mentor/course name.'''
     search_type = request.form.get('search_type')
 
     if search_term:
-        print("Search Term:", search_term)
-        print("Search Type:", search_type)
 
         if search_type == 'mentor':
             query += " AND mentor.mentor_name LIKE %s"
@@ -682,8 +664,6 @@ mentor/course name.'''
 
     query += f" ORDER BY {sort_option}"
 
-    print("Final query:", query)
-    print("Parameters:", parameters)
 
     cursor.execute(query, parameters)
 
