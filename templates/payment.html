@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Checkout</title>
+    <link rel="stylesheet" href="../static/style_payment.css">
+    <script src="https://kit.fontawesome.com/6d1a5b2acc.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="payment">
+            
+            <h2>Payment Gateway</h2>
+            <div class="form">
+                <form action="" method="post">
+                <div class="card space icon-relative">
+                    <label class="label">Card holder:</label>
+                    <input type="text" class="input" name="card_holder" placeholder="Card Holder Name">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="card space icon-relative">
+                    <label class="label">Card number: </label>
+                    <input type="text" class="input" name="card_holder" placeholder="Card Number">
+                    <i class="fa-regular fa-credit-card"></i>
+                </div>
+                <div class="card-grp space">
+                    <div class="card-item icon-relative">
+                        <label class="label">Expiry Date: </label>
+                        <input type="month" class="input" name="expiry_date" placeholder="00 / 00">
+                        
+                    </div>
+                    <div class="card-item icon-relative">
+                        <label class="label">CVC: </label>
+                        <input type="text" class="input" name="cvc" placeholder="000">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+                
+                    <button class="btn" type="submit">
+                    pay Rs {{amount}}
+                </button>
+                
+            </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
