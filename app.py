@@ -44,6 +44,10 @@ def init_db():
         db.commit()
 
 def send_email(sender,receiver,subject,message):
+ 
+ '''This function is responsible for sending an email. It takes the sender's email address,
+receiver's email address, email subject, and message content as input parameters.'''
+ 
     passcode=''
     text=f"Subject : {subject}\n\n{message}"
     server = smtplib.SMTP("smtp.gmail.com",587)
@@ -63,6 +67,13 @@ def hello2():
 
 @app.route('/process_login',methods=['GET','POST'])
 def process_login():
+ 
+ '''This route handles the processing of user login attempts. It verifies the provided
+username and password combination against records stored in the database for both
+mentees and mentors. Upon successful authentication, it redirects the user to their
+respective dashboard. If the login attempt fails, it renders the login page again with an
+error message indicating incorrect credentials.'''
+ 
     msg=''
     if request.method=='POST' and 'username' in request.form and 'password' in request.form:
         username=request.form['username']
@@ -103,6 +114,11 @@ def signup_main():
 
 @app.route('/dashboard_mentee/<username>')
 def dashboard_mentee(username):
+ 
+ '''This renders the dashboard for a mentee user. It retrieves information about the mentee
+from the database and fetches tags from the database to populate the search for
+courses section.'''
+ 
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
             'SELECT * FROM mentee WHERE username = % s ', (username,) )
@@ -114,6 +130,11 @@ def dashboard_mentee(username):
 
 @app.route('/dashboard_mentor/<username>')
 def dashboard_mentor(username):
+ 
+ '''This renders the dashboard for a mentor user. It retrieves information about the mentor
+from the database. Additionally, it fetches all courses associated with the mentor from
+the database.'''
+
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
             'SELECT * FROM mentor WHERE username = % s ', (username,) )
@@ -128,6 +149,11 @@ def dashboard_mentor(username):
 
 @app.route('/signup',methods=['GET','POST'])
 def signup_process():
+ 
+ '''This handles the signup process for both mentees and mentors. After validating the form
+data, it inserts the user's information into the respective database. For mentors, it also
+saves the uploaded resume file. Upon successful signup, it sends a confirmation email to
+the user's provided email address.'''
     
     msg=''
     if request.method=='POST':
@@ -170,6 +196,10 @@ def signup_process():
 
 @app.route('/user_category',methods=['GET','POST'])
 def user_category():
+ 
+ '''This handles the selection of user category (mentee or mentor).After receiving the user's
+selection, it renders the signup form based on the selected category.'''
+ 
     global user_type
     user_type=request.form['button']
     print("User type : ", user_type)
@@ -180,6 +210,12 @@ def user_category():
 
 @app.route('/profile_mentee/<username>',methods=['GET','POST'])
 def profile_mentee(username):
+
+ '''This is responsible for displaying and updating the profile of a mentee. When accessed
+via GET, it retrieves the mentee's profile details from the database. If accessed via
+POST, it processes the updated profile details submitted by the mentee, updates the
+database accordingly, and renders the updated profile page.'''
+ 
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
             'SELECT * FROM mentee WHERE username = % s ', (username,) )
@@ -226,6 +262,12 @@ def profile_mentee(username):
 
 @app.route('/profile_mentor/<username>',methods=['GET','POST'])
 def profile_mentor(username):
+
+ '''This is responsible for displaying and updating the profile of a mentor. When accessed
+via GET, it retrieves the mentor's profile details from the database. If accessed via POST,
+it processes the updated profile details submitted by the mentor, updates the database
+accordingly, and renders the updated profile page.'''
+ 
     viewer='mentor'
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
@@ -271,6 +313,9 @@ def view_file(username, filename):
 
 @app.route('/view_mentees')
 def view_mentees():
+
+ '''This is responsible for retrieving and displaying mentees enrolled in a specific course.'''
+ 
     course_id = int(request.args.get('course_id'))
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM course WHERE course_id = %s',(course_id,))
@@ -292,6 +337,11 @@ def view_mentees():
 
 @app.route('/view_mentor_profile',methods=['GET','POST'])
 def view_mentor_profile():
+
+ '''This is responsible for viewing and managing the profile of a mentor. It retrieves the
+mentor's profile details and renders a web page displaying the profile. It allows the
+administrator to approve or reject the mentor's profile.'''
+ 
     viewer = request.args.get('viewer')
     username=request.args.get('username')
     mentee_id=int(request.args.get('mentee_id'))
@@ -330,6 +380,11 @@ def view_mentor_profile():
     
 @app.route('/create_program/<username>',methods=['GET','POST'])
 def create_program(username):
+
+ '''This allows a mentor to create a new program/course. It renders a form for the mentor to
+input program details and then processes the submitted form data to create a new
+program/course.'''
+ 
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM tag')
     tags=cursor.fetchall()
@@ -365,6 +420,12 @@ def create_program(username):
         
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
+
+ '''This allows users to reset their passwords if they have forgotten them. It renders a form
+for users to input their username and email. It handles the password reset process,
+including sending an OTP to the user's email and updating the password if the OTP is
+correct.'''
+ 
     global otp_gen
     global email_fp
     global usertype_fp
@@ -425,6 +486,12 @@ def forgot_password():
 
 @app.route('/admin',methods=['GET','POST'])
 def admin():
+ 
+ '''This serves as the dashboard for the administrator, providing access to various
+functionalities for managing the platform. It retrieves information about unapproved
+mentors, unapproved courses, and pending complaints and handles actions taken by the
+administrator, such as approving mentors or courses and resolving complaints.'''
+ 
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM mentor WHERE mentor_status = %s', ('unverified',))
     unapproved_mentors=cursor.fetchall()
@@ -438,6 +505,9 @@ def admin():
 
 @app.route('/add_tag',methods=['GET','POST'])
 def add_tag():       
+
+ '''This allows administrator to add new tags to the system'''
+ 
     if request.method=='POST':
         new_tag=request.form['tag']
         cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -450,6 +520,11 @@ def add_tag():
 
 @app.route('/view_course',methods=['GET','POST'])
 def view_course():
+
+ '''This is used to view details about a specific course. Administrators can view course
+details, mentees enrolled in the course, and approve or reject course proposals.
+Mentees and mentors can also view course details.'''
+ 
     viewer = request.args.get('viewer')
     course_id = int(request.args.get('course_id'))
     mentee_id=int(request.args.get('mentee_id'))
@@ -505,6 +580,11 @@ def process_viewer_request():
 
 @app.route('/payment',methods=['GET','POST'])
 def payment():
+
+ '''This facilitates the payment process for a course. Upon successful payment, it registers
+the mentee for the course and sends confirmation emails to both the mentee and the
+mentor.'''
+ 
     amount = request.args.get('amount')
     mentee_id = int(request.args.get('mentee_id'))
     course_id=int(request.args.get('course_id'))
@@ -526,6 +606,9 @@ def payment():
 
 @app.route('/my_courses/<username>',methods=['GET','POST'])
 def my_courses(username):
+
+ '''This route retrieves and displays the courses enrolled by a mentee'''
+ 
     cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM mentee WHERE username=%s',(username,))
     mentee=cursor.fetchone()
@@ -541,6 +624,9 @@ def my_courses(username):
 
 @app.route('/submit_mentee_complaint/<int:mentee_id>', methods=['GET','POST'])
 def submit_mentee_complaint(mentee_id):
+
+ '''This route allows mentees to submit complaints.'''
+
     if request.method=='POST':
         complaint_date = datetime.now()
         complaint_desc = request.form['complaint_desc']    
@@ -557,7 +643,12 @@ def submit_mentee_complaint(mentee_id):
 
 @app.route('/search_sort_filter', methods=['POST'])
 def search_sort_filter():
-    """Sorts, searches, and filters data based on the provided parameters."""
+
+ '''This method is responsible for sorting, searching, and filtering data based on the
+provided parameters. It primarily deals with retrieving course data from the database,
+applying sorting options, filtering by tags, and searching for courses based on
+mentor/course name.'''
+ 
     username = request.args.get('username')
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM mentee WHERE username=%s',(username,))
@@ -664,6 +755,10 @@ def complaint_against_mentee():
 
 @app.route('/messages')
 def messages():
+
+ '''This method displays all previous messages of a particular course.All important
+announcements made are displayed from the database.'''
+ 
     course_id = int(request.args.get('course_id'))
     username = (request.args.get('username'))
     viewer = (request.args.get('viewer'))    
@@ -696,6 +791,10 @@ def messages():
  
 @socketio.on('new_message') # socketio to handle real time chat
 def handle_new_message(data):
+ 
+ '''This method receives the new message input by the user and add it to the database.It
+also uses socketio to handle real time chatting . The new message is emitted.'''
+ 
     sender = data['sender']
     content = data['content']
     course_id = int(data['course_id'])
@@ -774,6 +873,9 @@ def submit_feedback():
 
 @app.route('/logout')
 def logout():
+
+ '''This route handles user logout functionality'''
+ 
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
