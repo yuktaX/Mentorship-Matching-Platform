@@ -777,6 +777,9 @@ also uses socketio to handle real time chatting . The new message is emitted.'''
 
 @app.route('/view_mentee_complaint',methods=['GET','POST'])
 def view_mentee_complaint():
+
+ '''This function views the mentor's complaint to the admin.'''
+ 
     complaint_id = int(request.args.get('complaint_id'))
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
@@ -797,6 +800,9 @@ def view_mentee_complaint():
 
 @app.route('/view_mentor_complaint',methods=['GET','POST'])
 def view_mentor_complaint():
+
+ ''' This function views the mentor's complaint to the admin.'''
+ 
     complaint_id = int(request.args.get('complaint_id'))
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
@@ -828,6 +834,11 @@ def view_mentor_complaint():
 
 @app.route('/submit_feedback', methods=['GET', 'POST'])
 def submit_feedback():
+
+ '''This function handles the submission of feedback for a course by a user. It expects a 'username' parameter to be provided via the request arguments.
+    If the HTTP method is POST, it retrieves course ID, rating, and feedback commentsfrom the form data, inserts them into the 'feedback' table in the database,
+    and redirects the user to their mentee dashboard.'''
+ 
     username=request.args.get('username')
     if request.method == 'POST':
         course_id = request.form['course_id']
