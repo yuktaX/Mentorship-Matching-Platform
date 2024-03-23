@@ -308,6 +308,9 @@ accordingly, and renders the updated profile page.'''
 
 @app.route('/view_file/<username>/<filename>')
 def view_file(username, filename):
+
+ ''' This helps in viewing the resumes of the mentors by the admin and mentees'''
+ 
     file_path=os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], username), filename)
     return send_file(file_path, as_attachment=True)
 
